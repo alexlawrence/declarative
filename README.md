@@ -1,6 +1,6 @@
 #declarative
 
-declarative provides a mapping of declarative custom HTML (data) attributes to arbitrary JavaScript methods/objects.
+declarative provides a mapping of declarative custom HTML (data) attributes to arbitrary JavaScript methods/objects. 
 
 ###Why
 
