@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>declarative with jQueryUI</title>
+
+    <script type="text/javascript" src="../vendor/jquery-1.7.js"></script>
+    <script type="text/javascript" src="../vendor/jquery-ui-1.8.16.min.js"></script>
+
+    <script type="text/javascript" src="../src/declarative.js"></script>
+    <script type="text/javascript" src="../src/parseOptions.js"></script>
+    <script type="text/javascript" src="../src/mappings.js"></script>
+    <script type="text/javascript" src="../src/apply.js"></script>
+  
+</head>
+<body>
+
+    <input data-jqueryui-datepicker="minDate: '31.12.2011'" type="text" />
+
+    <script type="text/javascript">
+
+        jQuery(function() {
+            'use strict';
+
+            declarative.mappings.add({
+                id: 'jQueryUI',
+                types: ['datepicker'],
+                attributePrefix: 'data-jqueryui-',
+                callback: function(element, type, options) {
+                    jQuery(element)[type](options);
+                }
+            });
+
+            declarative.apply('jQueryUI').to(document);
+
+        });
+
+    </script>
+
+</body>
+</html>

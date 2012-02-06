@@ -1,0 +1,10 @@
+/**
+ * @license
+ * declarative - HTML parsing library
+ * Requires JSON.parse
+ *
+ * Copyright 2011, Alex Lawrence
+ * Licensed under the MIT license.
+ * http://www.opensource.org/licenses/MIT
+ *
+ */
