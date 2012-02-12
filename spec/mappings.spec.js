@@ -24,7 +24,7 @@ describe('declarative.mappings', function() {
 
         });
 
-        it('should throw an error if the given object does not contain a attributePrefix property', function() {
+        it('should throw an error if the given object does not contain an attributePrefix property', function() {
 
             expect(function() {
                 subject.add({id: 'some id'});
@@ -64,7 +64,7 @@ describe('declarative.mappings', function() {
         subject.add({
             id: 'test',
             attributePrefix: 'data-',
-            types: ['calendar'],
+            validTypes: ['calendar'],
             callback: function(element, type, options) {
 
             }
@@ -74,7 +74,7 @@ describe('declarative.mappings', function() {
 
         expect(result).toBeDefined();
         expect(result.attributePrefix).toBe('data-');
-        expect(result.types[0]).toBe('calendar');
+        expect(result.validTypes[0]).toBe('calendar');
         expect(typeof result.callback).toBe('function');
 
     });

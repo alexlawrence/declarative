@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>declarative demo</title>
+
+    <script type="text/javascript" src="../vendor/jquery-1.7.js"></script>
+
+    <script type="text/javascript" src="../src/declarative.js"></script>
+    <script type="text/javascript" src="../src/parseOptions.js"></script>
+    <script type="text/javascript" src="../src/mappings.js"></script>
+    <script type="text/javascript" src="../src/apply.js"></script>
+  
+</head>
+<body>
+
+    <input type="text" id="text" value="Test" />
+    <span data-widget-counter="target: '#text'"></span>
+
+    <script type="text/javascript">
+
+        (function($) {
+
+            $.fn.counter = function(options) {
+                this.each(function() {
+                    var label = this;
+                    $(options.target).keyup(function() {
+                        $(label).text($(this).val().length);
+                    });
+                });
+            }
+
+        }(jQuery));
+
+    </script>
+
+    <script type="text/javascript">
+
+        declarative.mappings.add({
+            id: 'widgets',
+            validTypes: ['counter'],
+            attributePrefix: 'data-widget-',
+            callback: function(element, type, options) {
+                jQuery(element)[type](options);
+            }
+        });
+
+        declarative.apply('widgets').to(document);
+
+    </script>
+
+</body>
+</html>

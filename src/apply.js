@@ -12,23 +12,23 @@
     var applyTo = function(mapping, element) {
         verifyThatElementIsDOMObject(element);
         var attributePrefix = mapping.attributePrefix.toLowerCase();
-        var types = mapping.types, callback = mapping.callback;
+        var validTypes = mapping.validTypes, callback = mapping.callback;
         var children = element.getElementsByTagName('*'), currentElement = element;
         var currentIndex = children.length, attributes;
         while (currentElement) {
             attributes = currentElement.attributes || [];
             forEachMatchingAttribute(attributes, attributePrefix, function(type, options) {
-                    if (!types || indexOf(types, type) > -1) {
-                        callback(currentElement, type, options);
-                    }
+                if (!validTypes || indexOf(validTypes, type) > -1) {
+                    callback(currentElement, type, options);
+                }
             });
-            currentElement = currentIndex > 0 && children[--currentIndex];
+            currentElement = currentIndex && children[--currentIndex];
         }
     };
 
     var indexOf = function(haystack, needle) {
         for (var i = 0, j = haystack.length; i < j; i++) {
-            if (haystack[i] === needle) {
+            if (haystack[i] == needle) {
                 return i;
             }
         }
@@ -37,7 +37,7 @@
 
     var forEachMatchingAttribute = function(attributes, attributePrefix, callback) {
         forEachAttribute(attributes, function(attributeName, attributeValue) {
-            if (attributeName.indexOf(attributePrefix) !== 0) {
+            if (attributeName.indexOf(attributePrefix) != 0) {
                 return undefined;
             }
             var type = readType(attributeName, attributePrefix);

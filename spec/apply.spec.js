@@ -73,18 +73,21 @@ describe('declarative.apply', function() {
                 var element = $('<div data-prefix-type="option: \'value\'"></div>').get(0);
 
                 it('should call parseOptions with the value of the attribute', function() {
+
                     module.apply('some id').to(element);
                     expect(parseOptionsSpy).toHaveBeenCalledWith("option: 'value'");
 
                 });
 
-                it('should call the mapping callback with the element, the attribute name after the attribute prefix and the parsed options', function() {
+                it('should call the mapping callback with the element, the attribute name after the prefix and the parsed options', function() {
+
                     var options = {option: 'value'};
                     module.parseOptions = function() {
                         return options;
                     };
                     module.apply('some id').to(element);
                     expect(callbackSpy).toHaveBeenCalledWith(element, 'type', options);
+
                 });
 
             });
@@ -96,25 +99,28 @@ describe('declarative.apply', function() {
                 parent.appendChild(element);
 
                 it('should call parseOptions with the value of the attribute', function() {
+
                     module.apply('some id').to(parent);
                     expect(parseOptionsSpy).toHaveBeenCalledWith("option: 'value'");
 
                 });
 
-                it('should call the mapping callback with the element, the attribute name after the attribute prefix and the parsed options', function() {
+                it('should call the mapping callback with the element, the attribute name after the prefix and the parsed options', function() {
+
                     var options = {option: 'value'};
                     module.parseOptions = function() {
                         return options;
                     };
                     module.apply('some id').to(parent);
                     expect(callbackSpy).toHaveBeenCalledWith(element, 'type', options);
+
                 });
 
             });
 
             describe('given an element with a hyphenated attribute starting with the attribute prefix', function() {
 
-                it('should convert the attribute name after the attribute prefix to camel case before calling the callback', function() {
+                it('should convert the attribute name after the prefix to camel case before calling the callback', function() {
 
                     var element = $('<div data-prefix-hyphenated-type="option: \'value\'"></div>').get(0);
                     var options = {option: 'value'};
@@ -123,6 +129,7 @@ describe('declarative.apply', function() {
                     module.parseOptions = function() {
                         return options;
                     };
+
                     module.mappings.get = function() {
                         return {
                             id: 'some id',
@@ -132,15 +139,18 @@ describe('declarative.apply', function() {
                             }
                         }
                     };
+
                     module.apply('some id').to(element);
+
                     expect(typeSpy).toHaveBeenCalledWith('hyphenatedType');
+
                 });
 
             });
 
             describe('given an element with an uppercase attribute starting with the attribute prefix', function() {
 
-                it('should convert the attribute name after the attribute prefix to lowercase before calling the callback', function() {
+                it('should convert the attribute name after the prefix to lowercase before calling the callback', function() {
 
                     var element = $('<div data-prefix-UPPERCASE="option: \'value\'"></div>').get(0);
                     var options = {option: 'value'};
@@ -149,6 +159,7 @@ describe('declarative.apply', function() {
                     module.parseOptions = function() {
                         return options;
                     };
+
                     module.mappings.get = function() {
                         return {
                             id: 'some id',
@@ -158,97 +169,101 @@ describe('declarative.apply', function() {
                             }
                         }
                     };
+
                     module.apply('some id').to(element);
+
                     expect(typeSpy).toHaveBeenCalledWith('uppercase');
+
                 });
 
             });
 
         });
 
-    });
+        describe('given a mapping with a mixed case attribute prefix but without explicit types', function() {
 
-    describe('given a mapping with a mixed case attribute prefix but without explicit types', function() {
+            it('should convert the attribute prefix to lowercase before matching it against attributes', function() {
 
-        it('should convert the attribute prefix to lowercase before matching it against attributes', function() {
+                var callbackSpy = jasmine.createSpy('apply.to.callback');
 
-            var callbackSpy = jasmine.createSpy('apply.to.callback');
-
-            module.mappings.get = function() {
-                return {
-                    id: 'some id',
-                    attributePrefix: 'data-prefixWithCasing-',
-                    callback: callbackSpy
+                module.mappings.get = function() {
+                    return {
+                        id: 'some id',
+                        attributePrefix: 'data-prefixWithCasing-',
+                        callback: callbackSpy
+                    };
                 };
-            };
 
-            var element = $('<div data-prefixwithcasing-type="option: \'value\'"></div>').get(0);
+                var element = $('<div data-prefixwithcasing-type="option: \'value\'"></div>').get(0);
 
-            module.apply('some id').to(element);
+                module.apply('some id').to(element);
 
-            expect(callbackSpy).toHaveBeenCalled();
+                expect(callbackSpy).toHaveBeenCalled();
+
+            });
+
 
         });
 
+        describe('given a mapping with an attribute prefix and an array of explicit valid types', function() {
 
-    });
+            var typeSpy;
 
-    describe('given a mapping with an attribute prefix and an array of explicit types', function() {
+            beforeEach(function() {
 
-        var callbackSpy;
-        var typeSpy;
+                typeSpy = jasmine.createSpy('apply.to.callback.type');
 
-        beforeEach(function() {
-            typeSpy = jasmine.createSpy('apply.to.callback.type');
-            module.mappings.get = function() {
-                return {
-                    id: 'some id',
-                    attributePrefix: 'data-test-',
-                    types: ['valid', 'validHyphenated'],
-                    callback: function(element, type, options) {
-                        typeSpy(type);
-                    }
+                module.mappings.get = function() {
+                    return {
+                        id: 'some id',
+                        attributePrefix: 'data-test-',
+                        validTypes: ['valid', 'validHyphenated'],
+                        callback: function(element, type) {
+                            typeSpy(type);
+                        }
+                    };
                 };
-            };
 
-        });
+            });
 
-        it('should call the callback for an element with a type contained in the mapping types', function() {
+            it('should call the callback for an element with a type contained in the valid types', function() {
 
-            var element = $('<div data-test-valid="option: \'value\'"></div>').get(0);
+                var element = $('<div data-test-valid="option: \'value\'"></div>').get(0);
 
-            var options = {option: 'value'};
-            module.parseOptions = function() {
-                return options;
-            };
-            module.apply('some id').to(element);
-            expect(typeSpy).toHaveBeenCalledWith('valid');
+                var options = {option: 'value'};
+                module.parseOptions = function() {
+                    return options;
+                };
+                module.apply('some id').to(element);
+                expect(typeSpy).toHaveBeenCalledWith('valid');
 
-        });
+            });
 
-        it('should not call the callback for an element with a type not contained in the mapping types', function() {
+            it('should not call the callback for an element with a type not contained in the valid types', function() {
 
-            var element = $('<div data-test-invalid="option: \'value\'"></div>').get(0);
+                var element = $('<div data-test-invalid="option: \'value\'"></div>').get(0);
 
-            var options = {option: 'value'};
-            module.parseOptions = function() {
-                return options;
-            };
-            module.apply('some id').to(element);
-            expect(typeSpy).not.toHaveBeenCalled();
+                var options = {option: 'value'};
+                module.parseOptions = function() {
+                    return options;
+                };
+                module.apply('some id').to(element);
+                expect(typeSpy).not.toHaveBeenCalled();
 
-        });
+            });
 
-        it('should call the callback for an element with a hyphenated type contained as pascal case in the mapping types', function() {
+            it('should call the callback for an element with a hyphenated type contained as pascal case in the valid types', function() {
 
-            var element = $('<div data-test-valid-hyphenated="option: \'value\'"></div>').get(0);
+                var element = $('<div data-test-valid-hyphenated="option: \'value\'"></div>').get(0);
 
-            var options = {option: 'value'};
-            module.parseOptions = function() {
-                return options;
-            };
-            module.apply('some id').to(element);
-            expect(typeSpy).toHaveBeenCalledWith('validHyphenated');
+                var options = {option: 'value'};
+                module.parseOptions = function() {
+                    return options;
+                };
+                module.apply('some id').to(element);
+                expect(typeSpy).toHaveBeenCalledWith('validHyphenated');
+
+            });
 
         });
 
