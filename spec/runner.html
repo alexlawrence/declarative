@@ -8,12 +8,15 @@
 
     <!-- include source files here... -->
     <script type="text/javascript" src="../src/declarative.js"></script>
+    <script type="text/javascript" src="../src/versionOfInternetExplorer.js"></script>
+    <script type="text/javascript" src="../src/array.js"></script>
     <script type="text/javascript" src="../src/parseOptions.js"></script>
     <script type="text/javascript" src="../src/mappings.js"></script>
     <script type="text/javascript" src="../src/apply.js"></script>
 
     <!-- include spec files here... -->
     <script type="text/javascript" src="declarative.spec.js"></script>
+    <script type="text/javascript" src="array.spec.js"></script>
     <script type="text/javascript" src="parseOptions.spec.js"></script>
     <script type="text/javascript" src="mappings.spec.js"></script>
     <script type="text/javascript" src="apply.spec.js"></script>
@@ -21,12 +24,10 @@
 </head>
 <body>
 
-<script type="text/javascript">
-    jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
-    jasmine.getEnv().execute();
-</script>
+    <script type="text/javascript">
+        jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+        jasmine.getEnv().execute();
+    </script>
 
 </body>
 </html>
-
-

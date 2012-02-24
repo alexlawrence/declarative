@@ -1,7 +1,6 @@
 /**
  * @license
- * declarative - HTML parsing library
- * Requires JSON.parse
+ * declarative - may the source be with you - version 0.5.0
  *
  * Copyright 2011, Alex Lawrence
  * Licensed under the MIT license.

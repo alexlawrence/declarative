@@ -1,47 +1,69 @@
 describe('performance', function() {
 
-    describe('applying 2 mappings without explicit types to 3.000 elements with each 5 attributes', function() {
+    var countOfMappings = 5, countOfMatchingElements = 100, countOfNonMatchingElements = 1500;
+
+    describe('applying ' + countOfMappings + ' mappings with 5 types to ' +
+        countOfMatchingElements + ' elements with each 5 matching attributes and ' +
+        countOfNonMatchingElements + ' elements with each 5 non matching attributes ', function() {
 
         it('should not cause the page to freeze', function() {
 
-            var divTemplate =
+            var root = document.createElement('div'), parent, current, i;
+            var matchingMarkup =
                 '<div ' +
-                'data-one="one: \'one\'"' +
-                'data-twp="two: \'two\'"' +
-                'data-three="three: \'three\'"' +
-                'data-four="four: \'four\'"' +
-                'data-five="five: \'five\'"' +
+                'data-one="key: \'value\'" ' +
+                'data-two="key: \'value\'" ' +
+                'data-three="key: \'value\'" ' +
+                'data-four="key: \'value\'" ' +
+                'data-five="key: \'value\'">' +
                 '</div>';
-            var root = $(divTemplate);
-            for (var i = 0; i < 3000; i++) {
-                root.append($(divTemplate));
+            parent = root;
+            for (i = 0; i < countOfMatchingElements; i++) {
+                $(parent).append(current = $(matchingMarkup));
+                parent = current;
             }
 
-            declarative.mappings.add({
-                id: 'test 1',
-                attributePrefix: 'data-',
-                callback: function() {
+            var nonMatchingMarkup =
+                '<div ' +
+                'one="key: \'value\'" ' +
+                'two="key: \'value\'" ' +
+                'three="key: \'value\'" ' +
+                'four="key: \'value\'" ' +
+                'five="key: \'value\'">' +
+                '</div>';
+            parent = root;
+            for (i = 0; i < countOfNonMatchingElements; i++) {
+                $(parent).append(current = $(nonMatchingMarkup));
+                parent = current;
+            }
 
-                }
-            });
+            var calls = 0;
+            var logCallback = function(element, type, options) {
+                options.key == 'value' && calls++;
+            };
 
-            declarative.mappings.add({
-                id: 'test 2',
-                attributePrefix: 'data-',
-                callback: function() {
-
-                }
-            });
+            for (i = 0; i< countOfMappings; i++) {
+                declarative.mappings.add({
+                    id: 'test' + i,
+                    prefix: 'data-',
+                    types: ['one', 'two', 'three', 'four', 'five'],
+                    callback: logCallback});
+            }
 
             var startTime = new Date();
 
-            declarative.apply('test 1').to(root.get(0));
-            declarative.apply('test 2').to(root.get(0));
+            var mappingIds = [];
+            for (i = 0; i< countOfMappings; i++) {
+                mappingIds.push('test' + i);
+            }
+
+            declarative.apply(mappingIds).to(root);
 
             var elapsedTime = new Date() - startTime;
-            console.log('performance test took: ' + elapsedTime + ' ms');
 
-            expect(true).toBeTruthy();
+		    alert('performance test took: ' + elapsedTime + ' ms');
+			
+            expect(calls).toBe(countOfMatchingElements * countOfMappings * 5);
 
         });
 

@@ -7,6 +7,8 @@
     <script type="text/javascript" src="../vendor/jquery-1.7.js"></script>
 
     <script type="text/javascript" src="../src/declarative.js"></script>
+    <script type="text/javascript" src="../src/versionOfInternetExplorer.js"></script>
+    <script type="text/javascript" src="../src/array.js"></script>
     <script type="text/javascript" src="../src/parseOptions.js"></script>
     <script type="text/javascript" src="../src/mappings.js"></script>
     <script type="text/javascript" src="../src/apply.js"></script>
@@ -15,31 +17,15 @@
 <body>
 
     <input type="text" id="text" value="Test" />
-    <span data-widget-counter="target: '#text'"></span>
+    <span data-ui-counter="target: '#text'"></span>
 
-    <script type="text/javascript">
-
-        (function($) {
-
-            $.fn.counter = function(options) {
-                this.each(function() {
-                    var label = this;
-                    $(options.target).keyup(function() {
-                        $(label).text($(this).val().length);
-                    });
-                });
-            }
-
-        }(jQuery));
-
-    </script>
-
+    <script type="text/javascript" src="jquery.counter.js"></script>
     <script type="text/javascript">
 
         declarative.mappings.add({
             id: 'widgets',
-            validTypes: ['counter'],
-            attributePrefix: 'data-widget-',
+            prefix: 'data-ui-',
+            types: ['counter'],
             callback: function(element, type, options) {
                 jQuery(element)[type](options);
             }

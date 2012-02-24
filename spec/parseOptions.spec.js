@@ -10,14 +10,6 @@ describe('declarative.parseOptions', function() {
 
     });
 
-    it('should throw an error if the input contains double quotes', function() {
-
-        expect(function() {
-            subject.parseOptions('"key": "value"');
-        }).toThrow();
-
-    });
-
     it('should convert single quoted key and value separated by colon', function () {
 
         var result = subject.parseOptions("'key':'value'");

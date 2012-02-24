@@ -2,6 +2,8 @@
 
     'use strict';
 
-    global.declarative = {};
+    var module = global.declarative = {};
+
+
 
 }(window));
