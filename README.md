@@ -132,6 +132,11 @@ declarative.apply('jQuery.validate.form').to(document);
 declarative.apply('jQuery.validate.input').to(document);
 ```
 
+###Performance
+
+declarative is optimized for performance.
+It uses query selectors where available and parses only the minimum set of HTML elements and attributes.
+However it could lead to performance issues in IE7 when applying mappings to pages which contain more than 1500 DOM elements.
 
 
 ###Basics
