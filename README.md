@@ -2,10 +2,10 @@
 
 Mapper for declarative user interfaces in HTML.
 
-###What
+###Features
 
-declarative provides a simple way to map user interface declaration and configuration to arbitrary JavaScript code.
-Consider the following function for a character counter:
+declarative provides a simple way to map user interface declarations to arbitrary JavaScript code.
+Consider the following code for a character counter:
 
 ```javascript
 var countCharacters = function(input, counter) {
@@ -15,9 +15,9 @@ var countCharacters = function(input, counter) {
 };
 ```
 
-In order to use this one would normally write some plain and unrelated HTML in combination with
-some bootstrap code picking up the right DOM elements and passing them to the "countCharacters" method.
-Using declarative we can describe our user interface as follows:
+In order to use this function one would normally write some plain HTML in combination with bootstrapping code
+picking up the right DOM elements and passing them to the "countCharacters" method.
+Using _declarative_ we can describe our user interface as follows:
 
 ```html
 <label for="text">Enter your text:</label>
@@ -25,13 +25,13 @@ Using declarative we can describe our user interface as follows:
 <span data-counter="target: '#text'">0</span> characters
 ```
 
-There are three important values when describing custom user interface elements: the DOM element, the type and the options.
-In the above example we have one span element which uses the custom type "counter" and contains an option *target*
+There are three important values when describing custom user interface elements:
+the DOM elementitself, the custom type and its options.
+In the above example we have one span element which uses the custom type "counter" and contains an "target" option
 with the value of an CSS selector.
-
-Note the value of the data attribute. The syntax used by declarative is inspired by knockout.js.
-It accepts a comma separated list of key-value pairs where the value must be surrounded by single quotes.
-If no options should be passed the attribute value can be omitted.
+Note the value of the "data-counter" attribute. The syntax used by declarative is inspired by knockout.js.
+It accepts a comma separated list of key-value pairs where string values must be surrounded by single quotes.
+If no options should be passed the value can be omitted.
 
 The next step is to register the counter as a custom type and describe how it should be mapped to JavaScript code.
 This is done by adding a mapping to declarative:
@@ -48,13 +48,14 @@ declarative.mappings.add({
 });
 ```
 
-The id of a mapping identifies it for later use. The prefix describes the string that is put before the type attribute of an element.
-While it accepts any string it should normalky start with 'data-' to make use of HTML5 valid data attributes.
-The types array describes the valid types declarative should consider when applying the mapping.
-The callback function is called for every match of the mapping when applied.
+The _id_ of a mapping identifies it for later use.
+The _prefix_ describes the string that is put before the type when used as an attribute of an element.
+While it accepts any string it should normally start with "data-" to make use of HTML5 valid data attributes.
+The _types_ array describes the valid types declarative should consider when applying the mapping.
+The _callback_ function is called for every match of the mapping when applied.
 Parameters for the callback are the DOM element, the type without the prefix and the options as an object.
 
-To apply the above mapping to the HTML all we have to do is write the following:
+Applying the above mapping to the DOM is done by writing the following:
 
 ```javascript
 declarative.apply('counter').to(document);
@@ -65,12 +66,8 @@ either a single mapping or a list of mappings. It can be applied to any DOM elem
 
 ```javascript
 declarative.apply(['widgets', 'validation']).to(document.getElementById('#content'));
-
-// when using jquery unwrap selector results
-declarative.apply('counter').to($('#content').get(0));
+declarative.apply('counter').to($('#content').get(0)); // when using jQuery
 ```
-
-###Why
 
 declarative has the following benefits:
 
@@ -78,9 +75,13 @@ declarative has the following benefits:
 - Automatic transformation from readable user interface configurations to JavaScript objects
 - Eliminating repetition of DOM traversals and custom attribute parsing
 
+
+
+###Examples
+
 While mapping one single custom type as in the above example might not be too attractive have a look at the following examples:
 
-####Mapping jQueryUI types
+#####Mapping jQueryUI types
 
 ```html
 <div data-ui-draggable></div>
@@ -102,11 +103,11 @@ declarative.mappings.add({
 declarative.apply('jQueryUI').to(document);
 ```
 
-####Mapping jQuery.validate
+#####Mapping jQuery.validate
 
 ```html
 <form data-validate-form>
-    <input type="text" name="required" data-validate-required="value: true, message: 'This field is required'" />
+    <input type="text" name="required" data-validate-required="value: true, message: 'Required'" />
     <input type="text" name="minlength" data-validate-minlength="value: 3, message: 'Minimum of 3'" />
     <input type="text" name="maxlength" data-validate-maxlength="value: 6, message: 'Maximum of 6'" />
     <input type="submit" />
@@ -139,6 +140,8 @@ declarative.mappings.add({
 declarative.apply('jQuery.validate.form').to(document);
 declarative.apply('jQuery.validate.input').to(document);
 ```
+
+
 
 ###Explanation for beginners
 
