@@ -97,6 +97,30 @@ describe('declarative.apply(ids)', function() {
 
             });
 
+            describe('given an element with an attribute without value starting with the prefix and matching a type', function() {
+
+                var element = $('<div data-prefix-type></div>').get(0);
+
+                it('should call parseOptions with the value of the attribute', function() {
+
+                    module.apply('some id').to(element);
+                    expect(parseOptionsSpy).toHaveBeenCalledWith("");
+
+                });
+
+                it('should call the mapping callback with the DOM element, the type identifier and the parsed options', function() {
+
+                    var options = {};
+                    module.parseOptions = function() {
+                        return options;
+                    };
+                    module.apply('some id').to(element);
+                    expect(callbackSpy).toHaveBeenCalledWith(element, 'type', options);
+
+                });
+
+            });
+
             describe('given a parent containing a child with an attribute starting with the prefix and matching a type', function() {
 
                 var parent = $('<div id="parent"></div>').get(0);

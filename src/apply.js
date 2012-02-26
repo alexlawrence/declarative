@@ -15,17 +15,18 @@
 
     var applyMappings = function(mappings, element) {
         var allElements = getRelevantElements(mappings, element);
-        var mapping, type, elementIndex = allElements.length, attributes, attributeValue;
+        var mapping, type, elementIndex = allElements.length, attributes, attribute;
         var i = 0, j = mappings.length, k = 0, l = 0;
         while (element) {
             attributes = element.attributes;
             for (i = 0; i < j; i++) {
                 mapping = mappings[i];
                 for (k = 0, l = mapping.typesAsAttributes.length; k < l; k++) {
-                    attributeValue = element.getAttribute && element.getAttribute(mapping.typesAsAttributes[k]);
-                    if (attributeValue) {
+                    attribute = element.getAttributeNode
+                        && element.getAttributeNode(mapping.typesAsAttributes[k]);
+                    if (attribute && attribute.specified) {
                         type = mapping.types[k];
-                        mapping.callback(element, type, module.parseOptions(attributeValue));
+                        mapping.callback(element, type, module.parseOptions(attribute.nodeValue));
                     }
                 }
             }

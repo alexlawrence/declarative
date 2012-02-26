@@ -40,7 +40,7 @@
     };
 
     var singleQuoteRegex = new RegExp(/'/g),
-        keyWithoutQuotes = new RegExp(/(^|,)(\w+)\s*:/g);
+        keyWithoutQuotes = new RegExp(/(^|,)\s*(\w+)\s*:/g);
 
     var actualParseOptions = versionOfInternetExplorer() == 7 ? parseOptionsInIE7 : parseOptionsDefault;
 

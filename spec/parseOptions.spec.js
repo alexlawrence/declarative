@@ -24,11 +24,27 @@ describe('declarative.parseOptions', function() {
 
     });
 
-    it('should throw an error if a value has no quotes', function() {
+    it('should throw an error if a string value has no quotes', function() {
 
         expect(function() {
             subject.parseOptions("'key':value");
         }).toThrow();
+
+    });
+
+    it('should not throw an error if a boolean value has no quotes', function() {
+
+        expect(function() {
+            subject.parseOptions("'key':true");
+        }).not.toThrow();
+
+    });
+
+    it('should not throw an error if a number value has no quotes', function() {
+
+        expect(function() {
+            subject.parseOptions("'key':4");
+        }).not.toThrow();
 
     });
 
@@ -72,7 +88,7 @@ describe('declarative.parseOptions', function() {
 
     it('should convert a comma separated list of colon separated key value pairs even if all keys have no quotes', function() {
 
-        var result = subject.parseOptions("one:'one',two: 'two',three:'three'");
+        var result = subject.parseOptions("one:'one', two: 'two', three:'three'");
 
         expect(result.one).toBe('one');
         expect(result.two).toBe('two');
@@ -80,9 +96,25 @@ describe('declarative.parseOptions', function() {
 
     });
 
-    it('should convert a value containing an array to an array property', function() {
+    it('should convert a value containing a string array to an array property', function() {
 
         var result = subject.parseOptions("key: ['1', '2', '3']");
+
+        expect(result.key.length).toBe(3);
+
+    });
+
+    it('should convert a value containing an bool array to an array property', function() {
+
+        var result = subject.parseOptions("key: [true, false, true]");
+
+        expect(result.key.length).toBe(3);
+
+    });
+
+    it('should convert a value containing an number array to an array property', function() {
+
+        var result = subject.parseOptions("key: [1, 2, 3]");
 
         expect(result.key.length).toBe(3);
 

@@ -2,10 +2,10 @@
 
 Mapper for declarative user interfaces in HTML.
 
-###Features
+###What
 
-declarative provides a simple way to map user interface description and configuration to arbitrary JavaScript code.
-Consider the following snippet for a character counter we want to integrate on our website:
+declarative provides a simple way to map user interface declaration and configuration to arbitrary JavaScript code.
+Consider the following function for a character counter:
 
 ```javascript
 var countCharacters = function(input, counter) {
@@ -15,49 +15,132 @@ var countCharacters = function(input, counter) {
 };
 ```
 
-Normally we would write some plain and unrelated HTML stuffed with IDs in combination we some bootstrap code.
+In order to use this one would normally write some plain and unrelated HTML in combination with
+some bootstrap code picking up the right DOM elements and passing them to the "countCharacters" method.
 Using declarative we can describe our user interface as follows:
 
 ```html
 <label for="text">Enter your text:</label>
 <input id="text" type="text" />
-<span data-counter="target: '#text', ">0</span> characters
+<span data-counter="target: '#text'">0</span> characters
 ```
 
-declarative takes into account three values when parsing elements: the dom element, the custom type and the options.
-In this example we have one *span* element which is enriched with our custom counter type and
-contains an option *target* with the value of of an CSS selector. Note the syntax of the data attribute value.
-declarative accepts a comma separated list of key-value pairs where (only) the value must be surrounded by single quotes.
+There are three important values when describing custom user interface elements: the DOM element, the type and the options.
+In the above example we have one span element which uses the custom type "counter" and contains an option *target*
+with the value of an CSS selector.
 
-The next step is to add a mapping:
+Note the value of the data attribute. The syntax used by declarative is inspired by knockout.js.
+It accepts a comma separated list of key-value pairs where the value must be surrounded by single quotes.
+If no options should be passed the attribute value can be omitted.
+
+The next step is to register the counter as a custom type and describe how it should be mapped to JavaScript code.
+This is done by adding a mapping to declarative:
 
 ```javascript
 declarative.mappings.add({
     id: 'counter',
     prefix: 'data-widget-',
     types: ['counter']
-    callback: function(element, type, options) {
-        // ...
+    callback: function(counter, type, options) {
+        var input = document.querySelector(options.target);
+        countCharacters(input, counter);
     }
 });
 ```
 
-The id of a mapping identifies it for later use. Any string is valid.
-The prefix describes the string that is put before the type attribute of an element.
-While it accepts any string, normally the prefix should start with 'data-' to make use of HTML5 data attributes.
-The types array describes the valid custom types declarative should consider when applying a mapping.
+The id of a mapping identifies it for later use. The prefix describes the string that is put before the type attribute of an element.
+While it accepts any string it should normalky start with 'data-' to make use of HTML5 valid data attributes.
+The types array describes the valid types declarative should consider when applying the mapping.
 The callback function is called for every match of the mapping when applied.
-Parameters for the callback are the dom element, the custom type without the prefix and the options as an object.
+Parameters for the callback are the DOM element, the type without the prefix and the options as an object.
 
-To apply the above delcared mapping to the HTML all we have to do is to write the following:
+To apply the above mapping to the HTML all we have to do is write the following:
 
 ```javascript
 declarative.apply('counter').to(document);
 ```
 
-This causes declarative to parse the whole document for any matches of the *counter* mapping.
+This causes declarative to parse the whole document for any matches of the mapping. The "apply" method takes
+either a single mapping or a list of mappings. It can be applied to any DOM element. More examples:
 
-###Why you should use it
+```javascript
+declarative.apply(['widgets', 'validation']).to(document.getElementById('#content'));
+
+// when using jquery unwrap selector results
+declarative.apply('counter').to($('#content').get(0));
+```
+
+###Why
+
+declarative has the following benefits:
+
+- Clear separation of user interface configuration, mapping code and behaviour implementation
+- Automatic transformation from readable user interface configurations to JavaScript objects
+- Eliminating repetition of DOM traversals and custom attribute parsing
+
+While mapping one single custom type as in the above example might not be too attractive have a look at the following examples:
+
+####Mapping jQueryUI types
+
+```html
+<div data-ui-draggable></div>
+<div data-ui-progressbar="value: '100'"></div>
+<div data-ui-dialog="closeText: 'hide'"></div>
+<input type="text" data-ui-datepicker="minDate: '2012/03/01'" />
+```
+
+```javascript
+declarative.mappings.add({
+    id: 'jQueryUI',
+    prefix: 'data-ui-',
+    types: ['draggable', 'progressbar', 'dialog', 'datepicker'],
+    callback: function(element, type, options) {
+        $(element)[type](options);
+    }
+});
+
+declarative.apply('jQueryUI').to(document);
+```
+
+####Mapping jQuery.validate
+
+```html
+<form data-validate-form>
+    <input type="text" name="required" data-validate-required="value: true, message: 'This field is required'" />
+    <input type="text" name="minlength" data-validate-minlength="value: 3, message: 'Minimum of 3'" />
+    <input type="text" name="maxlength" data-validate-maxlength="value: 6, message: 'Maximum of 6'" />
+    <input type="submit" />
+</form>
+```
+
+```javascript
+declarative.mappings.add({
+    id: 'jQuery.validate.form',
+    prefix: 'data-validate-',
+    types: ['form'],
+    callback: function(element) {
+        $(element).validate();
+    }
+});
+
+declarative.mappings.add({
+    id: 'jQuery.validate.input',
+    prefix: 'data-validate-',
+    types: ['required', 'minlength', 'maxlength'],
+    callback: function(element, type, options) {
+        var rule = {};
+        rule[type] = options.value;
+        rule.messages = {};
+        rule.messages[type] = options.message;
+        $(element).rules('add', rule);
+    }
+});
+
+declarative.apply('jQuery.validate.form').to(document);
+declarative.apply('jQuery.validate.input').to(document);
+```
+
+###Explanation for beginners
 
 Assume we want to build a website where users can enter text and see how many characters it has.
 We start off with the HTML:
