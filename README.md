@@ -1,6 +1,6 @@
 #declarative
 
-declarative provides a convention based mapping from HTML (data) attributes to JavaScript methods and options.
+declarative provides mappings from HTML attributes and values to JavaScript methods and options.
 
 ###Why
 
@@ -20,7 +20,7 @@ Example mapping:
 
 ```javascript
 declarative.mappings.add({
-    id: 'widgets', // any string is valid
+    id: 'widgets',
     prefix: 'data-widget-',
     types: ['calendar', 'counter', 'specialType']
     callback: function(element, type, options) {

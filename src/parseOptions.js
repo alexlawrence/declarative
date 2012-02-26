@@ -1,5 +1,7 @@
 (function (module, versionOfInternetExplorer) {
 
+    'use strict';
+
     module.parseOptions = function(input) {
         try {
             return actualParseOptions(input);

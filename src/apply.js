@@ -7,14 +7,14 @@
         mappings = ensureArray(mappings);
         return {
             to: function(element) {
-                applyMappingsTo(mappings, element);
+                verifyThatElementIsDOMObject(element);
+                applyMappings(mappings, element);
             }
         };
     };
 
-    var applyMappingsTo = function(mappings, element) {
-        verifyThatElementIsDOMObject(element);
-        var allElements = element.all ? element.all : element.getElementsByTagName('*');
+    var applyMappings = function(mappings, element) {
+        var allElements = getRelevantElements(mappings, element);
         var mapping, type, elementIndex = allElements.length, attributes, attributeValue;
         var i = 0, j = mappings.length, k = 0, l = 0;
         while (element) {
@@ -31,6 +31,22 @@
             }
             element = elementIndex && allElements[--elementIndex];
         }
+    };
+
+    var getRelevantElements = function(mappings, element) {
+        if (element.querySelectorAll) {
+            return getRelevantElementsBySelector(mappings, element);
+        }
+        return element.all ? element.all : element.getElementsByTagName('*');
+    };
+
+    var getRelevantElementsBySelector = function(mappings, element) {
+        var attributes = [], attributeSelector, i, j;
+        for (i = 0, j = mappings.length; i < j; i++) {
+            attributes = attributes.concat(mappings[i].typesAsAttributes);
+        }
+        attributeSelector = '[' + attributes.join('],[') + ']';
+        return element.querySelectorAll(attributeSelector);
     };
 
     var verifyThatElementIsDOMObject = function(element) {
