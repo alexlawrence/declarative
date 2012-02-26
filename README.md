@@ -1,6 +1,6 @@
 #declarative
 
-Mapper for HTML user interface declarations.
+Mapper for declarative user interfaces in HTML.
 
 ###API
 
@@ -14,11 +14,13 @@ declarative.mappings.add({
     }
 });
 
-declarative.apply('some mapping').to(document);
+var anyDomElement = document.getElementsByTagName('*').item(1337);
+declarative.apply('some mapping').to(anyDomElement);
 ```
 
 ###Explanation
 
+If you need some basic explanation on this topic read the chapter "Basics" below.
 Consider the following code for a character counter:
 
 ```javascript
