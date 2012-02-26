@@ -20,7 +20,8 @@ declarative.apply('some mapping').to(anyDomElement);
 
 ###Explanation
 
-If you need some basic explanation on this topic read the chapter "Basics" below.
+If you are new to user interface development read the chapter "Basics" below.
+
 Consider the following code for a character counter:
 
 ```javascript
