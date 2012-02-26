@@ -1,6 +1,6 @@
 /**
  * @license
- * declarative - may the source be with you - version 0.6.0
+ * declarative - Mapper for declarative user interfaces in HTML - version 0.7.0
  *
  * Copyright 2012, Alex Lawrence
  * Licensed under the MIT license.
@@ -94,7 +94,7 @@
     };
 
     var singleQuoteRegex = new RegExp(/'/g),
-        keyWithoutQuotes = new RegExp(/(^|,)(\w+)\s*:/g);
+        keyWithoutQuotes = new RegExp(/(^|,)\s*(\w+)\s*:/g);
 
     var actualParseOptions = versionOfInternetExplorer() == 7 ? parseOptionsInIE7 : parseOptionsDefault;
 
@@ -207,17 +207,18 @@
 
     var applyMappings = function(mappings, element) {
         var allElements = getRelevantElements(mappings, element);
-        var mapping, type, elementIndex = allElements.length, attributes, attributeValue;
+        var mapping, type, elementIndex = allElements.length, attributes, attribute;
         var i = 0, j = mappings.length, k = 0, l = 0;
         while (element) {
             attributes = element.attributes;
             for (i = 0; i < j; i++) {
                 mapping = mappings[i];
                 for (k = 0, l = mapping.typesAsAttributes.length; k < l; k++) {
-                    attributeValue = element.getAttribute && element.getAttribute(mapping.typesAsAttributes[k]);
-                    if (attributeValue) {
+                    attribute = element.getAttributeNode
+                        && element.getAttributeNode(mapping.typesAsAttributes[k]);
+                    if (attribute && attribute.specified) {
                         type = mapping.types[k];
-                        mapping.callback(element, type, module.parseOptions(attributeValue));
+                        mapping.callback(element, type, module.parseOptions(attribute.nodeValue));
                     }
                 }
             }
