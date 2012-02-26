@@ -143,10 +143,10 @@ declarative.apply('jQuery.validate.input').to(document);
 
 
 
-###Explanation for beginners
+###Basics on UI development
 
 Assume we want to build a website where users can enter text and see how many characters it has.
-We start off with the HTML:
+We start off with the following HTML:
 
 ```html
 <label for="text">Enter your text:</label>
@@ -154,9 +154,10 @@ We start off with the HTML:
 <counter of="text"></counter> characters
 ```
 
-When viewing this page we will see that the input lets us enter text but the counting of characters does not work.
-This is because *input* is a valid element described in the HTML standard while *counter* is not.
-To overcome this we can replace the counter with a *span* element and write some custom JavaScript code:
+When viewing the above snippet in a browserwe will see that
+the input lets us enter text but the counting of characters does not work.
+This is because "input" is a valid element described in the HTML standard while "counter" is not.
+To overcome this we can replace the counter with a "span" element and write some custom JavaScript code:
 
 ```html
 <label for="text">Enter your text:</label>
@@ -170,8 +171,8 @@ document.getElementById('text').addEventListener('keyup', function() {
 });
 ```
 
-Although this code actually works it is not reusable because it is tightly coupled to specific elements (= configuration).
-This coupling can be eliminated by separating the different concerns as followed:
+Although this code actually works it is not reusable because it is tightly coupled to specific elements.
+This coupling can be eliminated by separating the different concerns as follows:
 
 ```javascript
 var countCharacters = function(input, counter) {
@@ -183,15 +184,11 @@ var countCharacters = function(input, counter) {
 countCharacters(document.getElementById('text'), document.getElementById('counter'));
 ```
 
-Now there is a reusable method and a one liner to intialize our specific counter instance.
-
 However the problem is that every time we want to use another character counter
 we also have to write one line of initialization code.
 The description and configuration of the counter element is scattered through HTML and JavaScript.
-
 Some people will argue that this is fine as it follows the best practice of separating the content (HTML)
 and the behaviour (JavaScript). This is not really correct.
-
 Looking at the one line of code we can see while it does contain behaviour and implementation details
 it also holds the description and configuration of our user interface.
 
