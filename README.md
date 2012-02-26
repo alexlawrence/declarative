@@ -5,7 +5,7 @@ Mapper for declarative user interfaces in HTML.
 ###Features
 
 declarative provides a simple way to map user interface declarations to arbitrary JavaScript code.
-Consider the following code for a character counter:
+Consider the following code snippet for a character counter:
 
 ```javascript
 var countCharacters = function(input, counter) {
@@ -17,7 +17,7 @@ var countCharacters = function(input, counter) {
 
 In order to use this function one would normally write some plain HTML in combination with bootstrapping code
 picking up the right DOM elements and passing them to the "countCharacters" method.
-Using _declarative_ we can describe our user interface as follows:
+Using declarative we can describe our user interface as follows:
 
 ```html
 <label for="text">Enter your text:</label>
@@ -26,9 +26,9 @@ Using _declarative_ we can describe our user interface as follows:
 ```
 
 There are three important values when describing custom user interface elements:
-the DOM elementitself, the custom type and its options.
+the DOM element itself, the custom type and its options.
 In the above example we have one span element which uses the custom type "counter" and contains an "target" option
-with the value of an CSS selector.
+with the value of a CSS selector.
 Note the value of the "data-counter" attribute. The syntax used by declarative is inspired by knockout.js.
 It accepts a comma separated list of key-value pairs where string values must be surrounded by single quotes.
 If no options should be passed the value can be omitted.
@@ -48,11 +48,11 @@ declarative.mappings.add({
 });
 ```
 
-The _id_ of a mapping identifies it for later use.
-The _prefix_ describes the string that is put before the type when used as an attribute of an element.
+The **id** of a mapping is for looking it up in the registry for later use.
+The **prefix** describes the string that is put before the type when used as an attribute of an HTML element.
 While it accepts any string it should normally start with "data-" to make use of HTML5 valid data attributes.
-The _types_ array describes the valid types declarative should consider when applying the mapping.
-The _callback_ function is called for every match of the mapping when applied.
+The **types** array describes the types declarative searches for when applying the mapping.
+The **callback** function is called for every match of the mapping when applied.
 Parameters for the callback are the DOM element, the type without the prefix and the options as an object.
 
 Applying the above mapping to the DOM is done by writing the following:
@@ -68,14 +68,6 @@ either a single mapping or a list of mappings. It can be applied to any DOM elem
 declarative.apply(['widgets', 'validation']).to(document.getElementById('#content'));
 declarative.apply('counter').to($('#content').get(0)); // when using jQuery
 ```
-
-declarative has the following benefits:
-
-- Clear separation of user interface configuration, mapping code and behaviour implementation
-- Automatic transformation from readable user interface configurations to JavaScript objects
-- Eliminating repetition of DOM traversals and custom attribute parsing
-
-
 
 ###Examples
 
@@ -129,9 +121,8 @@ declarative.mappings.add({
     prefix: 'data-validate-',
     types: ['required', 'minlength', 'maxlength'],
     callback: function(element, type, options) {
-        var rule = {};
+        var rule = {messages: {}};
         rule[type] = options.value;
-        rule.messages = {};
         rule.messages[type] = options.message;
         $(element).rules('add', rule);
     }
@@ -143,10 +134,12 @@ declarative.apply('jQuery.validate.input').to(document);
 
 
 
-###Basics on UI development
+###Basics
 
-Assume we want to build a website where users can enter text and see how many characters it has.
-We start off with the following HTML:
+This chapter is for anyone who is not yet familiar with some common patterns of custom user interface element development.
+It describes how you should write your code with the example of a character counter and shows how declarative can help you.
+
+Assume we want to build a website where users can enter text and see how many characters it has. We start off with the following HTML:
 
 ```html
 <label for="text">Enter your text:</label>
@@ -154,8 +147,7 @@ We start off with the following HTML:
 <counter of="text"></counter> characters
 ```
 
-When viewing the above snippet in a browserwe will see that
-the input lets us enter text but the counting of characters does not work.
+When viewing the above snippet in a browser we can see that the input lets us enter text but the counting of characters does not work.
 This is because "input" is a valid element described in the HTML standard while "counter" is not.
 To overcome this we can replace the counter with a "span" element and write some custom JavaScript code:
 
@@ -184,15 +176,15 @@ var countCharacters = function(input, counter) {
 countCharacters(document.getElementById('text'), document.getElementById('counter'));
 ```
 
-However the problem is that every time we want to use another character counter
+While this code is much cleaner, now the problem is that every time we want to use another character counter
 we also have to write one line of initialization code.
 The description and configuration of the counter element is scattered through HTML and JavaScript.
-Some people will argue that this is fine as it follows the best practice of separating the content (HTML)
-and the behaviour (JavaScript). This is not really correct.
-Looking at the one line of code we can see while it does contain behaviour and implementation details
-it also holds the description and configuration of our user interface.
+Some people will argue that this is correct as it follows the best practice of separating the content (HTML)
+and the behaviour (JavaScript). This is not correct.
+Looking at the one line of code we can see  it does contain behaviour and implementation details
+but it also holds the description and configuration of our user interface.
 
-By using HTML5 data attributes and parse them in our JavaScript we bring the configuration back to our view:
+By using HTML5 data attributes and parse them in our JavaScript we bring the configuration back to our HTML:
 
 ```html
 <label for="text">Enter your text:</label>
@@ -211,8 +203,9 @@ document.querySelectorAll('[data-counter-for]').forEach(function(counter) {
 ```
 
 Using the above code we can easily put counters on other pages without having to write one liners for the initialization.
-However there is one big mistake in the above sample implementation. Again multiple concerns are mixed together.
-One is the functionality of the character counter and the other one is the mapping of the configuration to the initialization.
+**But wait:** Now there is another big mistake in the implementation. Again, multiple concerns are mixed together.
+One is the functionality of the character counter itself and
+the other one is the mapping of the declaration and configuration to the actual behaviour.
 The correct way to do implement this would be:
 
 ```html
@@ -235,7 +228,7 @@ document.querySelectorAll('[data-counter-for]').forEach(function(counter) {
 });
 ```
 
-This is how user interface code should be written.
-With clear separation of concerns and declarative configuration of views.
+This is how almost all user interface code should be written.
 After writing some elements like this and the corresponding mapping from data attribues
-one will soon notice that the mapping part of the code always follows the same pattern.
+you will soon notice that the mapping part of the code always follows the same pattern.
+Then you can start using declarative :)
