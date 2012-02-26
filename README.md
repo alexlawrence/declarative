@@ -20,7 +20,7 @@ Using declarative we can describe our user interface as follows:
 
 ```html
 <label for="text">Enter your text:</label>
-<input id="text" type="text />
+<input id="text" type="text" />
 <span data-counter="target: '#text', ">0</span> characters
 ```
 
