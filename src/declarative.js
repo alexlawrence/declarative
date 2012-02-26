@@ -4,6 +4,4 @@
 
     var module = global.declarative = {};
 
-
-
 }(window));

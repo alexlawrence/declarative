@@ -8,7 +8,7 @@
 
     module.isArray = function(value) {
         return Object.prototype.toString.call(value) === '[object Array]';
-    }
+    };
 
     module.indexOf = function(haystack, needle) {
         for (var i = 0, j = haystack.length; i < j; i++) {
