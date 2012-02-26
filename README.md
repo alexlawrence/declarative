@@ -1,11 +1,25 @@
 #declarative
 
-Mapper for declarative user interfaces in HTML.
+Mapper for HTML user interface declarations.
 
-###Features
+###API
 
-declarative provides a simple way to map user interface declarations to arbitrary JavaScript code.
-Consider the following code snippet for a character counter:
+```javascript
+declarative.mappings.add({
+    id: 'some mapping',
+    prefix: 'data-attribute-prefix-',
+    types: ['types', 'to', 'map'],
+    callback: function(element, type, options) {
+        // ...
+    }
+});
+
+declarative.apply('some mapping').to(document);
+```
+
+###Explanation
+
+Consider the following code for a character counter:
 
 ```javascript
 var countCharacters = function(input, counter) {
@@ -15,7 +29,7 @@ var countCharacters = function(input, counter) {
 };
 ```
 
-In order to use this function one would normally write some plain HTML in combination with bootstrapping code
+In order to use this function we would normally write some plain HTML in combination with bootstrapping code
 picking up the right DOM elements and passing them to the "countCharacters" method.
 Using declarative we can describe our user interface as follows:
 
