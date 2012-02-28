@@ -4,23 +4,31 @@ Mapper for declarative user interfaces in HTML.
 
 ###API
 
+Adding mappings:
+
 ```javascript
 declarative.mappings.add({
-    id: 'some mapping',
-    prefix: 'data-attribute-prefix-',
-    types: ['types', 'to', 'map'],
+    id: 'example mapping', // string identifier
+    prefix: 'data-attribute-prefix-', // lowercase attribute prefix
+    types: ['types', 'to', 'map'], // types to parse
     callback: function(element, type, options) {
-        // ...
+        // callback is called for every match in the current mapping when applied
     }
 });
+```
 
-var anyDomElement = document.getElementsByTagName('*').item(1337);
-declarative.apply('some mapping').to(anyDomElement);
+Applying mappings:
+
+```javascript
+// mappings can be applied to any DOM element
+declarative.apply('example mapping').to(document);
+// multiple mappings should be passed as an array to a single apply() call
+declarative.apply(['example mapping', 'another mapping']).to(document);
 ```
 
 ###Explanation
 
-If you are new to user interface development read the chapter "Basics" below.
+For a detailed introduction read the chapter "Basics" below.
 
 Consider the following code for a character counter:
 
@@ -32,9 +40,9 @@ var countCharacters = function(input, counter) {
 };
 ```
 
-In order to use this function we would normally write some plain HTML in combination with bootstrapping code
+In order to use this function normally we would write plain HTML in combination with some code
 picking up the right DOM elements and passing them to the "countCharacters" method.
-Using declarative we can describe our user interface as follows:
+With declarative we can describe our user interface as follows:
 
 ```html
 <label for="text">Enter your text:</label>
@@ -42,12 +50,12 @@ Using declarative we can describe our user interface as follows:
 <span data-counter="target: '#text'">0</span> characters
 ```
 
-There are three important values when describing custom user interface elements:
-the DOM element itself, the custom type and its options.
-In the above example we have one span element which uses the custom type "counter" and contains an "target" option
-with the value of a CSS selector.
-Note the value of the "data-counter" attribute. The syntax used by declarative is inspired by knockout.js.
-It accepts a comma separated list of key-value pairs where string values must be surrounded by single quotes.
+There are three important values when describing custom elements:
+the **DOM element** itself, the **custom type** and its **options**.
+In the above example there is one span element which uses the custom type "counter"
+and contains an option "target" with the value of a CSS selector.
+Note the value of the "data-counter" attribute.
+The syntax used by declarative is equivalent to the object syntax in JavaScript without the most outer curly braces.
 If no options should be passed the value can be omitted.
 
 The next step is to register the counter as a custom type and describe how it should be mapped to JavaScript code.
@@ -65,9 +73,9 @@ declarative.mappings.add({
 });
 ```
 
-The **id** of a mapping is for looking it up in the registry for later use.
+The **id** of a mapping is used for (later) identification.
 The **prefix** describes the string that is put before the type when used as an attribute of an HTML element.
-While it accepts any string it should normally start with "data-" to make use of HTML5 valid data attributes.
+While it accepts any string in most cases it should start with "data-" to make use of HTML5 valid data attributes.
 The **types** array describes the types declarative searches for when applying the mapping.
 The **callback** function is called for every match of the mapping when applied.
 Parameters for the callback are the DOM element, the type without the prefix and the options as an object.
@@ -78,8 +86,8 @@ Applying the above mapping to the DOM is done by writing the following:
 declarative.apply('counter').to(document);
 ```
 
-This causes declarative to parse the whole document for any matches of the mapping. The "apply" method takes
-either a single mapping or a list of mappings. It can be applied to any DOM element. More examples:
+declarative then parses the whole document for any matches of the mapping. The "apply" method takes
+either a single mapping or a list of mappings. It can be applied to any DOM element.
 
 ```javascript
 declarative.apply(['widgets', 'validation']).to(document.getElementById('#content'));
@@ -88,7 +96,8 @@ declarative.apply('counter').to($('#content').get(0)); // when using jQuery
 
 ###Examples
 
-While mapping one single custom type as in the above example might not be too attractive have a look at the following examples:
+While mapping one single custom type as in the above example might not
+look too useful have a look at the following examples:
 
 #####Mapping jQueryUI types
 
@@ -152,8 +161,8 @@ declarative.apply('jQuery.validate.input').to(document);
 ###Performance
 
 declarative is optimized for performance.
-It uses query selectors where available and parses only the minimum set of HTML elements and attributes.
-However it could lead to performance issues in IE7 when applying mappings to pages which contain more than 1500 DOM elements.
+It uses query selectors where available and parses the minimum set of HTML elements and attributes.
+However in IE7 it could lead to performance issues when applying mappings to pages which contain more than 1500 DOM elements.
 
 
 ###Basics
