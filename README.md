@@ -22,13 +22,13 @@ Applying mappings:
 ```javascript
 // mappings can be applied to any DOM element
 declarative.apply('example mapping').to(document);
-// multiple mappings should be passed as an array to a single apply() call
+// multiple mappings for the same DOM element should be passed in a single call
 declarative.apply(['example mapping', 'another mapping']).to(document);
 ```
 
 ###Explanation
 
-For a detailed introduction read the chapter "Basics" below.
+For a detailed introduction on custom user interface development read the chapter "Basics" below.
 
 Consider the following code for a character counter:
 
@@ -40,9 +40,9 @@ var countCharacters = function(input, counter) {
 };
 ```
 
-In order to use this function normally we would write plain HTML in combination with some code
-picking up the right DOM elements and passing them to the "countCharacters" method.
-With declarative we can describe our user interface as follows:
+In order to use this function we would normally write some plain HTML in combination with
+bootsrapping code picking up the right DOM elements and passing them to the "countCharacters" method.
+With declarative we can describe our user interface as follows.
 
 ```html
 <label for="text">Enter your text:</label>
