@@ -42,7 +42,7 @@ var countCharacters = function(input, counter) {
 
 In order to use this function we would normally write some plain HTML in combination with
 bootsrapping code picking up the right DOM elements and passing them to the "countCharacters" method.
-With declarative we can describe our user interface as follows.
+With declarative we can describe our user interface as follows:
 
 ```html
 <label for="text">Enter your text:</label>
@@ -50,10 +50,10 @@ With declarative we can describe our user interface as follows.
 <span data-counter="target: '#text'">0</span> characters
 ```
 
-There are three important values when describing custom elements:
+There are three important values when describing custom UI elements:
 the **DOM element** itself, the **custom type** and its **options**.
-In the above example there is one span element which uses the custom type "counter"
-and contains an option "target" with the value of a CSS selector.
+In the above example there is one span element which has the custom type "counter"
+and an option "target" having the value of a CSS selector.
 Note the value of the "data-counter" attribute.
 The syntax used by declarative is equivalent to the object syntax in JavaScript without the most outer curly braces.
 If no options should be passed the value can be omitted.
@@ -75,7 +75,7 @@ declarative.mappings.add({
 
 The **id** of a mapping is used for (later) identification.
 The **prefix** describes the string that is put before the type when used as an attribute of an HTML element.
-While it accepts any string in most cases it should start with "data-" to make use of HTML5 valid data attributes.
+While any string is valid in most cases it should start with "data-" to make use of HTML5 valid data attributes.
 The **types** array describes the types declarative searches for when applying the mapping.
 The **callback** function is called for every match of the mapping when applied.
 Parameters for the callback are the DOM element, the type without the prefix and the options as an object.
@@ -139,7 +139,7 @@ declarative.mappings.add({
     types: ['form'],
     callback: function(element) {
         $(element).validate();
-    }
+    },
 });
 
 declarative.mappings.add({
@@ -167,10 +167,9 @@ However in IE7 it could lead to performance issues when applying mappings to pag
 
 ###Basics
 
-This chapter is for anyone who is not yet familiar with some common patterns of custom user interface element development.
-It describes how you should write your code with the example of a character counter and shows how declarative can help you.
-
-Assume we want to build a website where users can enter text and see how many characters it has. We start off with the following HTML:
+This chapter is for anyone who is not familiar with some common patterns of custom user interface element development.
+Assume we want to build a website where users can enter text and see how many characters it has.
+ We start off with the following HTML:
 
 ```html
 <label for="text">Enter your text:</label>
@@ -193,8 +192,7 @@ document.getElementById('text').addEventListener('keyup', function() {
     document.getElementById('counter').innerHTML = this.value.length;
 });
 ```
-
-Although this code actually works it is not reusable because it is tightly coupled to specific elements.
+While this code actually works it is not reusable because it is tightly coupled to specific elements.
 This coupling can be eliminated by separating the different concerns as follows:
 
 ```javascript
@@ -207,15 +205,15 @@ var countCharacters = function(input, counter) {
 countCharacters(document.getElementById('text'), document.getElementById('counter'));
 ```
 
-While this code is much cleaner, now the problem is that every time we want to use another character counter
+However now the problem is that every time we want to use another character counter
 we also have to write one line of initialization code.
 The description and configuration of the counter element is scattered through HTML and JavaScript.
-Some people will argue that this is correct as it follows the best practice of separating the content (HTML)
+Some may argue that this is correct as it follows the best practice of separating the content (HTML)
 and the behaviour (JavaScript). This is not correct.
-Looking at the one line of code we can see  it does contain behaviour and implementation details
+Looking at the one line of code one can see it does contain behaviour and implementation details
 but it also holds the description and configuration of our user interface.
 
-By using HTML5 data attributes and parse them in our JavaScript we bring the configuration back to our HTML:
+By using HTML5 data attributes and parsing them in our JavaScript we can put the configuration back in our HTML:
 
 ```html
 <label for="text">Enter your text:</label>
@@ -233,8 +231,8 @@ document.querySelectorAll('[data-counter-for]').forEach(function(counter) {
 });
 ```
 
-Using the above code we can easily put counters on other pages without having to write one liners for the initialization.
-**But wait:** Now there is another big mistake in the implementation. Again, multiple concerns are mixed together.
+With the above code we can easily put counters on other pages without having to write one liners for the initialization.
+However there is another mistake in the implementation. Multiple concerns are mixed together again.
 One is the functionality of the character counter itself and
 the other one is the mapping of the declaration and configuration to the actual behaviour.
 The correct way to do implement this would be:
@@ -259,7 +257,7 @@ document.querySelectorAll('[data-counter-for]').forEach(function(counter) {
 });
 ```
 
-This is how almost all user interface code should be written.
-After writing some elements like this and the corresponding mapping from data attribues
-you will soon notice that the mapping part of the code always follows the same pattern.
-Then you can start using declarative :)
+Custom user interface code should be written like that.
+After writing some elements like this and the corresponding mapping from data attributes
+one will soon notice that the mapping part of the code always follows the same pattern
+and can be centralized by using libraries such as declarative.
