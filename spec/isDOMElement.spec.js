@@ -1,0 +1,49 @@
+describe('declarative.isDOMElement', function() {
+
+    var testMethod = declarative.isDOMElement;
+
+    it('should return false if given no element', function() {
+
+        var result = testMethod();
+
+        expect(result).toBeFalsy();
+
+    });
+
+    it('should return false if given an empty object', function() {
+
+        var result = testMethod({});
+
+        expect(result).toBeFalsy();
+
+    });
+
+    it('should return false if given a jquery selector result', function() {
+
+        var result = testMethod($('<div></div>'));
+
+        expect(result).toBeFalsy();
+
+    });
+
+    it('should return false if given a DOM attribute', function() {
+
+        var attribute = document.createAttribute('something');
+
+        var result = testMethod(attribute);
+
+        expect(result).toBeFalsy();
+
+    });
+
+    it('should return true if given a DOM element', function() {
+
+        var element = document.createElement('something');
+
+        var result = testMethod(element);
+
+        expect(result).toBeTruthy();
+
+    });
+
+});

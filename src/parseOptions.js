@@ -1,24 +1,24 @@
-(function (module, versionOfInternetExplorer) {
+(function() {
 
-    'use strict';
+    var JSONisAvailable = declarative.versionOfInternetExplorer() != 7;
 
-    module.parseOptions = function(input) {
+    declarative.parseOptions = function(input) {
         try {
-            return actualParseOptions(input);
+            return parsingStrategy(input);
         }
         catch (error) {
             generateError('JSON parsing error');
         }
     };
 
-    var parseOptionsDefault = function(input) {
+    var parseUsingJson = function(input) {
         input = addMissingQuotesForKeys(input);
         input = replaceSingleWithDoubleQuotes(input);
         input = addCurlyBraces(input);
         return JSON.parse(input);
     };
 
-    var parseOptionsInIE7 = function(input) {
+    var parseUsingEval = function(input) {
         eval('var output = {' + input + '};');
         return output;
     };
@@ -42,6 +42,6 @@
     var singleQuoteRegex = new RegExp(/'/g),
         keyWithoutQuotes = new RegExp(/(^|,)\s*(\w+)\s*:/g);
 
-    var actualParseOptions = versionOfInternetExplorer() == 7 ? parseOptionsInIE7 : parseOptionsDefault;
+    var parsingStrategy = JSONisAvailable ? parseUsingJson : parseUsingEval;
 
-}(declarative, declarative.versionOfInternetExplorer));
+}());

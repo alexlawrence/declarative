@@ -1,32 +1,46 @@
-(function(module, indexOf, ensureArray) {
+(function() {
 
-    'use strict';
+    var ensureArray = declarative.array.ensureArray;
+    var isDOMElement = declarative.isDOMElement;
+    var mappingModes = declarative.mappingModes;
 
-    module.apply = function(ids) {
-        var mappings = module.mappings.get(ids);
+    declarative.apply = function(ids) {
+        var mappings = declarative.mappings.get(ids);
         mappings = ensureArray(mappings);
         return {
-            to: function(element) {
-                verifyThatElementIsDOMObject(element);
-                applyMappings(mappings, element);
-            }
+            to: function(element) { apply(mappings, element); }
         };
     };
 
-    var applyMappings = function(mappings, element) {
+    declarative.applyAll = function() {
+        var mappings = declarative.mappings.getAll();
+        return {
+            to: function(element) { apply(mappings, element); }
+        }
+    };
+
+    var apply = function(mappings, element) {
+        verifyDOMElement(element);
         var allElements = getRelevantElements(mappings, element);
-        var mapping, type, elementIndex = allElements.length, attributes, attribute;
-        var i = 0, j = mappings.length, k = 0, l = 0;
+        var mapping, elementIndex = allElements.length, attributes, attribute;
+        var i = 0, j = mappings.length, k = 0, m = 0, options;
         while (element) {
             attributes = element.attributes;
             for (i = 0; i < j; i++) {
                 mapping = mappings[i];
-                for (k = 0, l = mapping.typesAsAttributes.length; k < l; k++) {
-                    attribute = element.getAttributeNode
-                        && element.getAttributeNode(mapping.typesAsAttributes[k]);
-                    if (attribute && attribute.specified) {
-                        type = mapping.types[k];
-                        mapping.callback(element, type, module.parseOptions(attribute.nodeValue));
+                for (k = 0, m = mapping.convertedTypes.length; k < m; k++) {
+                    if (mapping.mappingMode === mappingModes.attribute) {
+                        attribute = element.getAttributeNode && element.getAttributeNode(mapping.convertedTypes[k]);
+                        if (attribute && attribute.specified) {
+                            options = declarative.parseOptions(attribute.nodeValue);
+                            mapping.callback(element, mapping.types[k], options);
+                        }
+                    }
+                    if (mapping.mappingMode === mappingModes.element) {
+                        if (element.nodeName.toLowerCase() == mapping.convertedTypes[k]) {
+                            options = declarative.getSpecifiedAttributes(element);
+                            mapping.callback(element, mapping.types[k], options);
+                        }
                     }
                 }
             }
@@ -42,16 +56,28 @@
     };
 
     var getRelevantElementsBySelector = function(mappings, element) {
-        var attributes = [], attributeSelector, i, j;
-        for (i = 0, j = mappings.length; i < j; i++) {
-            attributes = attributes.concat(mappings[i].typesAsAttributes);
+        var seekedByType = {};
+        seekedByType[mappingModes.attribute] = [];
+        seekedByType[mappingModes.element] = [];
+        for (var i = 0, j = mappings.length; i < j; i++) {
+            var mapping = mappings[i];
+            seekedByType[mapping.mappingMode] = seekedByType[mapping.mappingMode].concat(mapping.convertedTypes);
         }
-        attributeSelector = '[' + attributes.join('],[') + ']';
-        return element.querySelectorAll(attributeSelector);
+        var selector = generateSelector(seekedByType);
+        return element.querySelectorAll(selector);
     };
 
-    var verifyThatElementIsDOMObject = function(element) {
-        if (!element || typeof element.nodeName !== 'string') {
+    var generateSelector = function(seekedByType) {
+        var attributeSelector = seekedByType[mappingModes.attribute].join('],[');
+        if (attributeSelector) {
+            attributeSelector = '[' + attributeSelector + ']';
+        }
+        var elementSelector = seekedByType[mappingModes.element].join(',');
+        return attributeSelector + (attributeSelector && elementSelector ? ',' : '') + elementSelector;
+    };
+
+    var verifyDOMElement = function(element) {
+        if (!isDOMElement(element)) {
             generateError('invalid element (DOM object required)');
         }
     };
@@ -60,4 +86,4 @@
         throw new Error('declarative.apply.to: ' + message);
     };
 
-}(declarative, declarative.array.indexOf, declarative.array.ensureArray));
+}());

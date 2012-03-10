@@ -1,4 +1,4 @@
-describe('array', function() {
+describe('declarative.array', function() {
 
     it('should provide a sub module of declarative named array', function() {
 

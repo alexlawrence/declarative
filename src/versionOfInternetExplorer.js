@@ -1,7 +1,7 @@
-(function(module) {
+(function() {
 
     // based on: http://msdn.microsoft.com/en-us/library/ms537509%28v=vs.85%29.aspx
-    module.versionOfInternetExplorer = function() {
+    declarative.versionOfInternetExplorer = function() {
         var version = -1;
         if (navigator.appName == 'Microsoft Internet Explorer') {
             var ua = navigator.userAgent;
@@ -11,6 +11,6 @@
             }
         }
         return version;
-    }
+    };
 
-}(declarative));
+}());

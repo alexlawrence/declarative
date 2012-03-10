@@ -26,20 +26,11 @@ describe('declarative.mappings', function() {
 
             });
 
-            it('should throw an error if the mapping contains no prefix property', function() {
-
-                expect(function() {
-                    subject.add({id: 'some id'});
-                }).toThrow('declarative.mappings.add: missing prefix');
-
-            });
-
             it('should throw an error if the mapping contains no types', function() {
 
                 expect(function() {
                     subject.add({
-                        id: 'some id',
-                        prefix: 'data-'
+                        id: 'some id'
                     });
                 }).toThrow('declarative.mappings.add: missing types');
 
@@ -50,7 +41,6 @@ describe('declarative.mappings', function() {
                 expect(function() {
                     subject.add({
                         id: 'some id',
-                        prefix: 'data-',
                         types: 'foobar'
                     });
                 }).toThrow('declarative.mappings.add: invalid types');
@@ -69,12 +59,11 @@ describe('declarative.mappings', function() {
 
             });
 
-            it('should not throw an error if the mapping contains an id, a prefix, a types array and a callback', function() {
+            it('should not throw an error if the mapping contains an id, a types array and a callback', function() {
 
                 expect(function() {
                     subject.add({
                         id: 'some id',
-                        prefix: 'data-',
                         types: ['foo', 'bar'],
                         callback: function() {}
                     });
@@ -87,17 +76,54 @@ describe('declarative.mappings', function() {
                 expect(function() {
                     subject.add({
                         id: 'some id',
-                        prefix: 'data-',
                         types: ['foo', 'bar'],
                         callback: function() {}
                     });
                     subject.add({
                         id: 'some id',
-                        prefix: 'data-',
                         types: ['foo', 'bar'],
                         callback: function() {}
                     });
                 }).toThrow('declarative.mappings.add: duplicate id "some id"');
+
+            });
+
+            it('should not throw an error if the mapping contains a mappingMode property of "attribute"', function() {
+
+                expect(function() {
+                    subject.add({
+                        id: 'some id',
+                        types: ['foo', 'bar'],
+                        mappingMode: 'attribute',
+                        callback: function() {}
+                    });
+                }).not.toThrow();
+
+            });
+
+            it('should not throw an error if the mapping contains a mappingMode property of "element"', function() {
+
+                expect(function() {
+                    subject.add({
+                        id: 'some id',
+                        types: ['foo', 'bar'],
+                        mappingMode: 'element',
+                        callback: function() {}
+                    });
+                }).not.toThrow();
+
+            });
+
+            it('should throw an error if the mappings contains an invalid mappingMode property"', function() {
+
+                expect(function() {
+                    subject.add({
+                        id: 'some id',
+                        types: ['foo', 'bar'],
+                        mappingMode: 'foobar',
+                        callback: function() {}
+                    });
+                }).toThrow('declarative.mappings.add: invalid mappingMode');
 
             });
 
@@ -107,7 +133,6 @@ describe('declarative.mappings', function() {
 
             var validMapping = {
                 id: 'some other id',
-                prefix: 'data-',
                 types: ['foo', 'bar'],
                 callback: function() {}
             };
@@ -128,20 +153,11 @@ describe('declarative.mappings', function() {
 
             });
 
-            it('should throw an error if one contains no prefix property', function() {
-
-                expect(function() {
-                    subject.add([{id: 'some id'}, validMapping]);
-                }).toThrow('declarative.mappings.add: missing prefix');
-
-            });
-
             it('should throw an error if one contains no types', function() {
 
                 expect(function() {
                     subject.add([{
-                        id: 'some id',
-                        prefix: 'data-'
+                        id: 'some id'
                     }, validMapping]);
                 }).toThrow('declarative.mappings.add: missing types');
 
@@ -152,7 +168,6 @@ describe('declarative.mappings', function() {
                 expect(function() {
                     subject.add([{
                         id: 'some id',
-                        prefix: 'data-',
                         types: 'foobar'
                     }, validMapping]);
                 }).toThrow('declarative.mappings.add: invalid types');
@@ -164,24 +179,21 @@ describe('declarative.mappings', function() {
                 expect(function() {
                     subject.add([{
                         id: 'some id',
-                        prefix: 'data-',
                         types: ['foo', 'bar']
                     }, validMapping]);
                 }).toThrow('declarative.mappings.add: invalid callback');
 
             });
 
-            it('should not throw an error if both contain an id, a prefix and a types array', function() {
+            it('should not throw an error if both contain an id and a types array', function() {
 
                 expect(function() {
                     subject.add([{
                         id: 'some id',
-                        prefix: 'data-',
                         types: ['foo', 'bar'],
                         callback: function() {}
                     }, {
                         id: 'some other id',
-                        prefix: 'data-',
                         types: ['foo', 'bar'],
                         callback: function() {}
                     }]);
@@ -224,17 +236,29 @@ describe('declarative.mappings', function() {
 
             });
 
-            it('should have transformed the prefix to lowercase when returning the mapping', function() {
+            it('should have added a mappingMode property with value "attribute" when returning the mapping', function() {
 
                 subject.add({
                     id: 'some id',
-                    prefix: 'someMixedCase',
                     types: ['calendar'],
                     callback: function() {}
                 });
 
                 var result = subject.get('some id');
-                expect(result.prefix).toBe('somemixedcase');
+                expect(result.mappingMode).toBe('attribute');
+
+            });
+
+            it('should have added an empty string as prefix if no prefix was given when returning the mapping', function() {
+
+                subject.add({
+                    id: 'some id',
+                    types: ['calendar'],
+                    callback: function() {}
+                });
+
+                var result = subject.get('some id');
+                expect(result.prefix).toBe('');
 
             });
 
@@ -252,7 +276,7 @@ describe('declarative.mappings', function() {
 
             });
 
-            it('should have added a typesAsAttributes object which contains all types combined with the prefix', function() {
+            it('should have added a convertedTypes object which contains all types combined with the prefix', function() {
 
                 subject.add({
                     id: 'some id',
@@ -262,13 +286,13 @@ describe('declarative.mappings', function() {
                 });
 
                 var result = subject.get('some id');
-                expect(result.typesAsAttributes).toBeDefined();
-                expect(result.typesAsAttributes[0]).toBe('prefix-calendar');
-                expect(result.typesAsAttributes[1]).toBe('prefix-counter');
+                expect(result.convertedTypes).toBeDefined();
+                expect(result.convertedTypes[0]).toBe('prefix-calendar');
+                expect(result.convertedTypes[1]).toBe('prefix-counter');
 
             });
 
-            it('should have transformed all camel case types to hyphenated string in the typeMappings array', function() {
+            it('should have transformed all camel case types to hyphenated string in the convertedTypes array', function() {
 
                 subject.add({
                     id: 'some id',
@@ -278,9 +302,9 @@ describe('declarative.mappings', function() {
                 });
 
                 var result = subject.get('some id');
-                expect(result.typesAsAttributes).toBeDefined();
-                expect(result.typesAsAttributes[0]).toContain('some-casing');
-                expect(result.typesAsAttributes[1]).toContain('here-also');
+                expect(result.convertedTypes).toBeDefined();
+                expect(result.convertedTypes[0]).toContain('some-casing');
+                expect(result.convertedTypes[1]).toContain('here-also');
 
             });
 
@@ -325,6 +349,44 @@ describe('declarative.mappings', function() {
                 expect(result.length).toBe(2);
 
             });
+
+        });
+
+    });
+
+    describe('mappings.getAll', function() {
+
+        it('should return a list of all mappings', function() {
+
+            subject.add({
+                id: '1',
+                types: ['type'],
+                callback: function() {}
+            });
+            subject.add({
+                id: '2',
+                types: ['type'],
+                callback: function() {}
+            });
+            subject.add({
+                id: '3',
+                types: ['type'],
+                callback: function() {}
+            });
+            subject.add({
+                id: '4',
+                types: ['type'],
+                callback: function() {}
+            });
+            subject.add({
+                id: '5',
+                types: ['type'],
+                callback: function() {}
+            });
+
+            var result = subject.getAll();
+
+            expect(result.length).toBe(5);
 
         });
 
