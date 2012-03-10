@@ -1,1 +1,1 @@
-declarative = {};
+var declarative = {};

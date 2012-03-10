@@ -22,7 +22,7 @@
     }
 }(this, function () {
 
-declarative = {};
+var declarative = {};
 (function() {
 
     // based on: http://msdn.microsoft.com/en-us/library/ms537509%28v=vs.85%29.aspx
