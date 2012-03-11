@@ -46,4 +46,12 @@ describe('declarative.isDOMElement', function() {
 
     });
 
+    it('should return true if given the document element', function() {
+
+        var result = testMethod(document);
+
+        expect(result).toBeTruthy();
+
+    });
+
 });
