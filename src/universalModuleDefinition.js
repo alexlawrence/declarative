@@ -13,7 +13,8 @@
     }
 }(this, function () {
 
-//code
+/* code */
+
 return declarative;
 
 }));

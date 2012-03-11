@@ -1,4 +1,5 @@
 var name = 'declarative';
+var placeholder = '/* code */';
 var filenames = [
     '../src/global.js',
     '../src/versionOfInternetExplorer.js','../src/array.js','../src/isDOMElement.js',
@@ -13,7 +14,7 @@ var code = '';
 filenames.forEach(function(filename) { code += fs.readFileSync(filename) + '\n'; });
 var universalModuleDefinition = fs.readFileSync('../src/universalModuleDefinition.js') + '';
 
-var library = license + universalModuleDefinition.replace('//code', code);
+var library = license + universalModuleDefinition.replace(placeholder, code);
 
 fs.writeFileSync('../bin/' + name + '.js', library);
 
