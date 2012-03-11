@@ -271,7 +271,7 @@ var declarative = {};
         };
     };
 
-    declarative.applyAll = function() {
+    declarative.applyAllMappings = function() {
         var mappings = declarative.mappings.getAll();
         return {
             to: function(element) { apply(mappings, element); }

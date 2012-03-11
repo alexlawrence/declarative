@@ -150,9 +150,9 @@ declarative.apply('example mapping').to(document);
 // multiple mappings for the same DOM element should be passed in a single call
 declarative.apply(['example mapping', 'another mapping']).to(document);
 // all available mappings can be applied at once
-declarative.applyAll().to(document);
+declarative.applyAllMappings().to(document);
 // DOM elements need to be unwrapped when using jquery
-declarative.applyAll().to($('#someElement').get(0));
+declarative.applyAllMappings().to($('#someElement').get(0));
 ```
 
 ###Examples
