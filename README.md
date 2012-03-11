@@ -1,6 +1,6 @@
 #declarative
 
-Mapper for custom user interface markup languages.
+Mapper for custom user interface markup.
 
 ###Why
 
@@ -254,4 +254,4 @@ declarative.mappings.add({
 **Notes**:
 
 - Using custom elements that are not part of the HTML standard might cause rendering proglems and styling issues
-- The element mapping is not well tested across browsers as it is not really a best practice
+- This element mapping feature is not tested across different browsers as it is not really a best practice

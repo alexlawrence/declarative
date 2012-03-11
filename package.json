@@ -1,0 +1,29 @@
+{
+    "author": "Alex Lawrence <info@alex-lawrence.com>",
+    "maintainers": [
+        {
+            "name": "Alex Lawrence",
+            "email": "info@alex-lawrence.com"
+        }
+    ],
+    "contributors": [
+        {
+            "name": "Alex Lawrence",
+            "email": "info@alex-lawrence.com"
+        }
+    ],
+    "name": "declarative",
+    "description": "Mapper for custom user interface markup",
+    "version": "1.0.0",
+    "homepage": "http://www.github.com/alexlawrence/declarative",
+    "main" : "./bin/declarative.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/alexlawrence/declarative.git"
+    },
+    "engines": {
+        "node": "0.6.7"
+    },
+    "license": "MIT",
+    "dependencies": {}
+}
