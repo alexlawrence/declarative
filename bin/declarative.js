@@ -1,6 +1,6 @@
 /**
  * @license
- * declarative - Mapper for custom user interface markup - version 1.0.0
+ * declarative - Mapper for custom user interface markup - version 1.0.1
  *
  * Copyright 2012, Alex Lawrence
  * Licensed under the MIT license.
@@ -271,7 +271,7 @@ var declarative = {};
         };
     };
 
-    declarative.applyAll = function() {
+    declarative.applyAllMappings = function() {
         var mappings = declarative.mappings.getAll();
         return {
             to: function(element) { apply(mappings, element); }

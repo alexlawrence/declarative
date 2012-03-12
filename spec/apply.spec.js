@@ -23,16 +23,16 @@ describe('declarative.apply', function() {
         module.getSpecifiedAttributes = originalGetSpecifiedAttributes;
     });
 
-    describe('declarative.applyAll', function() {
+    describe('declarative.applyAllMappings', function() {
 
-        var testMethod = module.applyAll;
+        var testMethod = module.applyAllMappings;
 
         it('should request all mappings', function() {
 
             var spy = jasmine.createSpy('mappings.getAll');
             module.mappings.getAll = spy;
 
-            testMethod('some id');
+            testMethod();
 
             expect(spy).toHaveBeenCalled();
 
@@ -44,7 +44,7 @@ describe('declarative.apply', function() {
                 return {};
             };
 
-            var subject = testMethod('some id');
+            var subject = testMethod();
             expect(typeof subject.to).toBe('function');
 
         });
