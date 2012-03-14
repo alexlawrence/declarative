@@ -253,5 +253,5 @@ declarative.mappings.add({
 
 **Notes**:
 
-- Using custom elements that are not part of the HTML standard might cause rendering proglems and styling issues
+- Using custom elements that are not part of the HTML standard might cause rendering problems and styling issues
 - This element mapping feature is not tested across different browsers as it is not really a best practice
