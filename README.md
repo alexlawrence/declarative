@@ -2,7 +2,7 @@
 
 Mapper for custom user interface markup.
 
-###Why
+###Motivation
 
 When writing web user interfaces without using JavaScript we are restricted to the set of native interface elements
 defined in the HTML standard and thus implemented by the browser.
@@ -13,7 +13,7 @@ the DOM using some criteria such as IDs or classes.
 
 We do this because we want to separate the behavior from the content and its structure. However in most cases
 we are not only pulling out the behavior but also the interface configuration. Consider the following search form
-with a custom character counter in combination with some JavaScript:
+with a character counter displaying how many characters are left to enter:
 
 ```html
 <form action="/" method="POST">
@@ -108,9 +108,8 @@ declarative.mappings.add({
     prefix: 'data-widget-',
     types: ['counter']
     callback: function(counter, type, options) {
-        var input = document.querySelector(options.target);
-        var maxlength = input.getAttribute('maxlength');
-        countCharacters(input, counter, maxlength);
+        var input = document.getElementById(options.target);
+        countCharacters(input, counter, options.text);
     }
 });
 ```
@@ -253,5 +252,5 @@ declarative.mappings.add({
 
 **Notes**:
 
-- Using custom elements that are not part of the HTML standard might cause rendering proglems and styling issues
+- Using custom elements that are not part of the HTML standard might cause rendering problems and styling issues
 - This element mapping feature is not tested across different browsers as it is not really a best practice
