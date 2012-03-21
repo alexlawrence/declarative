@@ -109,8 +109,7 @@ declarative.mappings.add({
     types: ['counter']
     callback: function(counter, type, options) {
         var input = document.getElementById(options.target);
-        var maxlength = input.getAttribute('maxlength');
-        countCharacters(input, counter, maxlength);
+        countCharacters(input, counter, options.text);
     }
 });
 ```
