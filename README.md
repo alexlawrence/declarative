@@ -108,7 +108,7 @@ declarative.mappings.add({
     prefix: 'data-widget-',
     types: ['counter']
     callback: function(counter, type, options) {
-        var input = document.querySelector(options.target);
+        var input = document.getElementById(options.target);
         var maxlength = input.getAttribute('maxlength');
         countCharacters(input, counter, maxlength);
     }
