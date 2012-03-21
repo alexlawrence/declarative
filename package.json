@@ -22,7 +22,7 @@
         "url": "https://github.com/alexlawrence/declarative.git"
     },
     "engines": {
-        "node": "0.6.7"
+        "node": ">=0.6.7"
     },
     "license": "MIT",
     "dependencies": {}
