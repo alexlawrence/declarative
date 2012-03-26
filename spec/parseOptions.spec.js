@@ -104,6 +104,14 @@ describe('declarative.parseOptions', function() {
 
     });
 
+    it('should convert a value containing an object even if the nested object keys have no quotes', function() {
+
+        var result = testMethod("key: {subKey: 1}");
+
+        expect(result.key.subKey).toBe(1);
+
+    });
+
     it('should convert a value containing an bool array to an array property', function() {
 
         var result = testMethod("key: [true, false, true]");

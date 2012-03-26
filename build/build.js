@@ -2,7 +2,7 @@ var name = 'declarative';
 var placeholder = '/* code */';
 var filenames = [
     '../src/global.js',
-    '../src/versionOfInternetExplorer.js','../src/array.js','../src/isDOMElement.js',
+    '../src/array.js','../src/isDOMElement.js',
     '../src/parseOptions.js','../src/getSpecifiedAttributes.js',
     '../src/mappings.js','../src/apply.js'
 ];

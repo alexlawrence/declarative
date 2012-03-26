@@ -19,7 +19,7 @@ with a character counter displaying how many characters are left to enter:
 <form action="/" method="POST">
     <input id="search" name="search" type="text" maxlength="50" />
     <span id="counter"></span>
-    <input type="submit">
+    <input type="submit" />
 </form>
 ```
 
@@ -48,7 +48,7 @@ One better way to implement this would be the following:
 <form action="/" method="POST">
     <input id="search" name="search" type="text" maxlength="50" />
     <span id="counter" data-target="search" data-text="{0} characters left"></span>
-    <input type="submit">
+    <input type="submit" />
 </form>
 ```
 
@@ -74,7 +74,7 @@ The above example becomes even more obvious when you imagine the counter being a
 <form action="/" method="POST">
     <input id="search" name="search" type="text" maxlength="50" />
     <counter for="search">{0} characters left</counter>
-    <input type="submit">
+    <input type="submit" />
 </form>
 ```
 
@@ -89,7 +89,7 @@ Let´s assume we want to implement our search interface using declarative. We st
 <form action="/" method="POST">
     <input id="search" name="search" type="text" maxlength="50" />
     <span data-widget-counter="target: 'search', text: '{0} characters left'"></span>
-    <input type="submit">
+    <input type="submit" />
 </form>
 ```
 

@@ -1,6 +1,6 @@
 /**
  * @license
- * declarative - Mapper for custom user interface markup - version 1.0.1
+ * declarative - Mapper for custom user interface markup - version 1.0.2
  *
  * Copyright 2012, Alex Lawrence
  * Licensed under the MIT license.
@@ -23,22 +23,6 @@
 }(this, function () {
 
 var declarative = {};
-(function() {
-
-    // based on: http://msdn.microsoft.com/en-us/library/ms537509%28v=vs.85%29.aspx
-    declarative.versionOfInternetExplorer = function() {
-        var version = -1;
-        if (navigator.appName == 'Microsoft Internet Explorer') {
-            var ua = navigator.userAgent;
-            var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
-            if (re.exec(ua) != null) {
-              version = parseFloat( RegExp.$1 );
-            }
-        }
-        return version;
-    };
-
-}());
 (function() {
 
     var array = declarative.array = {};
@@ -73,22 +57,14 @@ var declarative = {};
 }());
 (function() {
 
-    var JSONisAvailable = declarative.versionOfInternetExplorer() != 7;
-
     declarative.parseOptions = function(input) {
+        return parseUsingEval(input);
         try {
-            return parsingStrategy(input);
+            return parseUsingEval(input);
         }
         catch (error) {
             generateError('JSON parsing error');
         }
-    };
-
-    var parseUsingJson = function(input) {
-        input = addMissingQuotesForKeys(input);
-        input = replaceSingleWithDoubleQuotes(input);
-        input = addCurlyBraces(input);
-        return JSON.parse(input);
     };
 
     var parseUsingEval = function(input) {
@@ -96,26 +72,9 @@ var declarative = {};
         return output;
     };
 
-    var addMissingQuotesForKeys = function(input) {
-        return input.replace(keyWithoutQuotes, '$1"$2":');
-    };
-
-    var replaceSingleWithDoubleQuotes = function(input) {
-        return input.replace(singleQuoteRegex, '"');
-    };
-
-    var addCurlyBraces = function(input) {
-        return '{' + input + '}';
-    };
-
     var generateError = function(message) {
         throw new Error('declarative.parseOptions: ' + message);
     };
-
-    var singleQuoteRegex = new RegExp(/'/g),
-        keyWithoutQuotes = new RegExp(/(^|,)\s*(\w+)\s*:/g);
-
-    var parsingStrategy = JSONisAvailable ? parseUsingJson : parseUsingEval;
 
 }());
 (function(){
