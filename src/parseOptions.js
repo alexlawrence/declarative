@@ -1,7 +1,6 @@
 (function() {
 
     declarative.parseOptions = function(input) {
-        return parseUsingEval(input);
         try {
             return parseUsingEval(input);
         }
