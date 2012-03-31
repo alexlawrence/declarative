@@ -1,7 +1,7 @@
 (function() {
 
-    var isArray = declarative.array.isArray;
-    var ensureArray = declarative.array.ensureArray;
+    var isArray = internal.array.isArray;
+    var ensureArray = internal.array.ensureArray;
 
     declarative.mappings = {};
 

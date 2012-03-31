@@ -1,1 +1,2 @@
 var declarative = {};
+var internal = {};

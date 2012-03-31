@@ -1,6 +1,6 @@
-describe('declarative.isDOMElement', function() {
+describe('internal.isDOMElement', function() {
 
-    var testMethod = declarative.isDOMElement;
+    var testMethod = internal.isDOMElement;
 
     it('should return false if given no element', function() {
 

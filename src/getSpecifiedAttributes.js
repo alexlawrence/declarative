@@ -1,6 +1,6 @@
 (function(){
 
-    var isDOMElement = declarative.isDOMElement;
+    var isDOMElement = internal.isDOMElement;
 
     declarative.getSpecifiedAttributes = function(element) {
         verifyDOMElement(element);

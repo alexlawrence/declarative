@@ -7,4 +7,11 @@ describe('declarative', function() {
 
     });
 
+    it('should provide a global object named internal', function() {
+
+        expect(internal).toBeDefined();
+        expect(typeof internal).toBe('object');
+
+    });
+
 });

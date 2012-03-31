@@ -14,7 +14,7 @@
     ],
     "name": "declarative",
     "description": "Mapper for custom user interface markup",
-    "version": "1.0.2",
+    "version": "1.0.5",
     "homepage": "http://www.github.com/alexlawrence/declarative",
     "main" : "./bin/declarative.js",
     "repository": {

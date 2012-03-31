@@ -1,7 +1,7 @@
 (function() {
 
-    var ensureArray = declarative.array.ensureArray;
-    var isDOMElement = declarative.isDOMElement;
+    var ensureArray = internal.array.ensureArray;
+    var isDOMElement = internal.isDOMElement;
     var mappingModes = declarative.mappingModes;
 
     declarative.apply = function(ids) {

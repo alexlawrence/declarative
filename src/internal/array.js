@@ -1,6 +1,6 @@
 (function() {
 
-    var array = declarative.array = {};
+    var array = internal.array = {};
 
     array.ensureArray = function(value) {
         return array.isArray(value) ? value : [value];

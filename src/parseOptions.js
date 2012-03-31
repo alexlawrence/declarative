@@ -5,13 +5,13 @@
             return parseUsingEval(input);
         }
         catch (error) {
-            generateError('JSON parsing error');
+            generateError('Parsing error');
         }
     };
 
     var parseUsingEval = function(input) {
-        eval('var output = {' + input + '};');
-        return output;
+        var output;
+        return eval('output = {' + input + '}');
     };
 
     var generateError = function(message) {

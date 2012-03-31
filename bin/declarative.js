@@ -1,6 +1,6 @@
 /**
  * @license
- * declarative - Mapper for custom user interface markup - version 1.0.2
+ * declarative - Mapper for custom user interface markup - '1.0.5'
  *
  * Copyright 2012, Alex Lawrence
  * Licensed under the MIT license.
@@ -9,23 +9,19 @@
  */ 
 (function (root, factory) {
     if (typeof exports === 'object') {
-        // Node. Does not work with strict CommonJS, but
-        // only CommonJS-like enviroments that support module.exports,
-        // like Node.
         module.exports = factory();
     } else if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
         define(factory);
     } else {
-        // Browser globals
         root.declarative = factory();
     }
 }(this, function () {
 
 var declarative = {};
+var internal = {};
 (function() {
 
-    var array = declarative.array = {};
+    var array = internal.array = {};
 
     array.ensureArray = function(value) {
         return array.isArray(value) ? value : [value];
@@ -47,7 +43,7 @@ var declarative = {};
 }());
 (function(){
 
-    declarative.isDOMElement = function(element) {
+    internal.isDOMElement = function(element) {
         return element &&
             (element.nodeType === ELEMENT_NODE || element.nodeType === DOCUMENT_NODE);
     };
@@ -55,31 +51,9 @@ var declarative = {};
     var ELEMENT_NODE = 1, DOCUMENT_NODE = 9;
 
 }());
-(function() {
-
-    declarative.parseOptions = function(input) {
-        return parseUsingEval(input);
-        try {
-            return parseUsingEval(input);
-        }
-        catch (error) {
-            generateError('JSON parsing error');
-        }
-    };
-
-    var parseUsingEval = function(input) {
-        eval('var output = {' + input + '};');
-        return output;
-    };
-
-    var generateError = function(message) {
-        throw new Error('declarative.parseOptions: ' + message);
-    };
-
-}());
 (function(){
 
-    var isDOMElement = declarative.isDOMElement;
+    var isDOMElement = internal.isDOMElement;
 
     declarative.getSpecifiedAttributes = function(element) {
         verifyDOMElement(element);
@@ -102,8 +76,29 @@ var declarative = {};
 }());
 (function() {
 
-    var isArray = declarative.array.isArray;
-    var ensureArray = declarative.array.ensureArray;
+    declarative.parseOptions = function(input) {
+        try {
+            return parseUsingEval(input);
+        }
+        catch (error) {
+            generateError('Parsing error');
+        }
+    };
+
+    var parseUsingEval = function(input) {
+        var output;
+        return eval('output = {' + input + '}');
+    };
+
+    var generateError = function(message) {
+        throw new Error('declarative.parseOptions: ' + message);
+    };
+
+}());
+(function() {
+
+    var isArray = internal.array.isArray;
+    var ensureArray = internal.array.ensureArray;
 
     declarative.mappings = {};
 
@@ -218,8 +213,8 @@ var declarative = {};
 
 (function() {
 
-    var ensureArray = declarative.array.ensureArray;
-    var isDOMElement = declarative.isDOMElement;
+    var ensureArray = internal.array.ensureArray;
+    var isDOMElement = internal.isDOMElement;
     var mappingModes = declarative.mappingModes;
 
     declarative.apply = function(ids) {
@@ -306,6 +301,8 @@ var declarative = {};
 
 }());
 
+
+declarative.version = '1.0.5';
 
 return declarative;
 

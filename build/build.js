@@ -1,25 +1,24 @@
-var name = 'declarative';
-var placeholder = '/* code */';
-var filenames = [
-    '../src/global.js',
-    '../src/array.js','../src/isDOMElement.js',
-    '../src/parseOptions.js','../src/getSpecifiedAttributes.js',
-    '../src/mappings.js','../src/apply.js'
-];
-
+var config = require('./config.js');
 var fs = require('fs');
 
-var license = fs.readFileSync('../LICENSE.txt') + '\n';
+var license = fs.readFileSync(config.licensePath) + '\n';
 var code = '';
-filenames.forEach(function(filename) { code += fs.readFileSync(filename) + '\n'; });
-var universalModuleDefinition = fs.readFileSync('../src/universalModuleDefinition.js') + '';
+config.filenames.forEach(function(filename) { code += fs.readFileSync(filename) + '\n'; });
+var universalModuleDefinition = fs.readFileSync(config.universalModuleDefinitionPath) + '';
 
-var library = license + universalModuleDefinition.replace(placeholder, code);
+code = universalModuleDefinition.replace(/_code/g, code);
+code = code.replace(/_globalName/g, 'root.' + config.name);
+code = code.replace(/_localName/g, config.name);
+code = code.replace(/_version/g, "'" + config.version + "'");
 
-fs.writeFileSync('../bin/' + name + '.js', library);
+license = license.replace(/_version/g, "'" + config.version + "'");
+
+var library = license + code;
+
+fs.writeFileSync('../bin/' + config.name + '.js', library);
 
 var exec = require('child_process').exec;
 var command = 'java -jar compiler/compiler.jar --compilation_level=SIMPLE_OPTIMIZATIONS ';
-command += '--js=../bin/' + name + '.js ';
-command += '--js_output_file=../bin/' + name + '.min.js';
+command += '--js=../bin/' + config.name + '.js ';
+command += '--js_output_file=../bin/' + config.name + '.min.js';
 exec(command);

@@ -1,13 +1,13 @@
-describe('declarative.array', function() {
+describe('internal.array', function() {
 
-    it('should provide a sub module of declarative named array', function() {
+    it('should provide a sub module of internal named array', function() {
 
-        expect(declarative.array).toBeDefined();
-        expect(typeof declarative.array).toBe('object');
+        expect(internal.array).toBeDefined();
+        expect(typeof internal.array).toBe('object');
 
     });
 
-    var subject = declarative.array;
+    var subject = internal.array;
 
     describe('isArray(value)', function() {
 
