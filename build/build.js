@@ -11,7 +11,7 @@ code = code.replace(/_globalName/g, 'root.' + config.name);
 code = code.replace(/_localName/g, config.name);
 code = code.replace(/_version/g, "'" + config.version + "'");
 
-license = license.replace(/_version/g, "'" + config.version + "'");
+license = license.replace(/_version/g, "version " + config.version);
 
 var library = license + code;
 
