@@ -1,6 +1,6 @@
-describe('declarative.getSpecifiedAttributes', function() {
+describe('internal.getSpecifiedAttributes', function() {
 
-    var testMethod = declarative.getSpecifiedAttributes;
+    var testMethod = internal.getSpecifiedAttributes;
 
     it('should throw an error if not given a DOM element', function() {
 

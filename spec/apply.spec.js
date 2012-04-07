@@ -1,36 +1,34 @@
 describe('declarative.apply', function() {
 
-    var module = declarative;
-
-    var originalMappingsGet = module.mappings.get;
-    var originalMappingsGetAll = module.mappings.getAll;
-    var originalParseOptions = module.parseOptions;
-    var originalGetSpecifiedAttributes = module.getSpecifiedAttributes;
+    var originalMappingsGet = declarative.mappings.get;
+    var originalMappingsGetAll = declarative.mappings.getAll;
+    var originalParseOptions = internal.parseOptions;
+    var originalGetSpecifiedAttributes = internal.getSpecifiedAttributes;
     var parseOptionsSpy;
     var getSpecifiedAttributesSpy;
 
     beforeEach(function() {
         parseOptionsSpy = jasmine.createSpy('parseOptions');
         getSpecifiedAttributesSpy = jasmine.createSpy('getSpecifiedAttributes');
-        module.parseOptions = parseOptionsSpy;
-        module.getSpecifiedAttributes = getSpecifiedAttributesSpy;
+        internal.parseOptions = parseOptionsSpy;
+        internal.getSpecifiedAttributes = getSpecifiedAttributesSpy;
     });
 
     afterEach(function() {
-        module.mappings.get = originalMappingsGet;
-        module.mappings.getAll = originalMappingsGetAll;
-        module.parseOptions = originalParseOptions;
-        module.getSpecifiedAttributes = originalGetSpecifiedAttributes;
+        declarative.mappings.get = originalMappingsGet;
+        declarative.mappings.getAll = originalMappingsGetAll;
+        internal.parseOptions = originalParseOptions;
+        internal.getSpecifiedAttributes = originalGetSpecifiedAttributes;
     });
 
     describe('declarative.applyAllMappings', function() {
 
-        var testMethod = module.applyAllMappings;
+        var testMethod = declarative.applyAllMappings;
 
         it('should request all mappings', function() {
 
             var spy = jasmine.createSpy('mappings.getAll');
-            module.mappings.getAll = spy;
+            declarative.mappings.getAll = spy;
 
             testMethod();
 
@@ -40,7 +38,7 @@ describe('declarative.apply', function() {
 
         it('should return an object containing a function to(element)', function() {
 
-            module.mappings.get = function() {
+            declarative.mappings.get = function() {
                 return {};
             };
 
@@ -53,14 +51,14 @@ describe('declarative.apply', function() {
 
     describe('declarative.apply(ids)', function() {
 
-        var testMethod = module.apply;
+        var testMethod = declarative.apply;
 
         describe('given a single mapping id for an existing mapping in the registry', function() {
 
             it('should look up the given id in the existing mappings', function() {
 
                 var spy = jasmine.createSpy('mappings.get');
-                module.mappings.get = spy;
+                declarative.mappings.get = spy;
 
                 testMethod('some id');
 
@@ -70,7 +68,7 @@ describe('declarative.apply', function() {
 
             it('should return an object containing a function to(element)', function() {
 
-                module.mappings.get = function() {
+                declarative.mappings.get = function() {
                     return {};
                 };
 
@@ -91,7 +89,7 @@ describe('declarative.apply', function() {
 
                     callbackSpy = jasmine.createSpy('apply.to.callback');
 
-                    module.mappings.get = function() {
+                    declarative.mappings.get = function() {
                         return {
                             id: 'some id',
                             prefix: 'data-prefix-',
@@ -106,7 +104,7 @@ describe('declarative.apply', function() {
 
                 it('should throw an error if the passed object is not a DOM object', function() {
 
-                    module.mappings.get = function() {
+                    declarative.mappings.get = function() {
                         return {};
                     };
 
@@ -121,7 +119,7 @@ describe('declarative.apply', function() {
 
                     var element = $('<div data-prefix-type="option: \'value\'"></div>').get(0);
 
-                    it('should call parseStringOptions with the value of the attribute', function() {
+                    it('should call parseOptions with the value of the attribute', function() {
 
                         testMethod('some id').to(element);
                         expect(parseOptionsSpy).toHaveBeenCalledWith("option: 'value'");
@@ -131,7 +129,7 @@ describe('declarative.apply', function() {
                     it('should call the mapping callback with the DOM element, the type identifier and the parsed options', function() {
 
                         var options = {option: 'value'};
-                        module.parseOptions = function() {
+                        internal.parseOptions = function() {
                             return options;
                         };
                         testMethod('some id').to(element);
@@ -145,7 +143,7 @@ describe('declarative.apply', function() {
 
                     var element = $('<div data-prefix-type></div>').get(0);
 
-                    it('should call parseStringOptions with the value of the attribute', function() {
+                    it('should call parseOptions with the value of the attribute', function() {
 
                         testMethod('some id').to(element);
                         expect(parseOptionsSpy).toHaveBeenCalledWith("");
@@ -155,7 +153,7 @@ describe('declarative.apply', function() {
                     it('should call the mapping callback with the DOM element, the type identifier and the parsed options', function() {
 
                         var options = {};
-                        module.parseOptions = function() {
+                        internal.parseOptions = function() {
                             return options;
                         };
                         testMethod('some id').to(element);
@@ -171,7 +169,7 @@ describe('declarative.apply', function() {
                     var element = $('<div data-prefix-type="option: \'value\'"></div>').get(0);
                     parent.appendChild(element);
 
-                    it('should call parseStringOptions with the value of the attribute', function() {
+                    it('should call parseOptions with the value of the attribute', function() {
 
                         testMethod('some id').to(parent);
                         expect(parseOptionsSpy).toHaveBeenCalledWith("option: 'value'");
@@ -181,7 +179,7 @@ describe('declarative.apply', function() {
                     it('should call the mapping callback with the DOM element, the type identifier and the parsed options', function() {
 
                         var options = {option: 'value'};
-                        module.parseOptions = function() {
+                        internal.parseOptions = function() {
                             return options;
                         };
                         testMethod('some id').to(parent);
@@ -191,15 +189,15 @@ describe('declarative.apply', function() {
 
                 });
 
-                describe('given an element with a hyphenated attribute starting with the prefix and matching a type', function() {
+                describe('given a hyphenated attribute starting with the prefix and matching a type when converted to camel case', function() {
 
-                    it('should convert the attribute name after the prefix to camel case and call the callback', function() {
+                    it('should call the callback with the correct type', function() {
 
                         var element = $('<div data-prefix-hyphenated-type="option: \'value\'"></div>').get(0);
                         var options = {option: 'value'};
                         var typeSpy = jasmine.createSpy('apply.to.callback.type');
 
-                        module.parseOptions = function() {
+                        internal.parseOptions = function() {
                             return options;
                         };
 
@@ -215,15 +213,15 @@ describe('declarative.apply', function() {
 
                 });
 
-                describe('given an element with an uppercase attribute starting with the prefix', function() {
+                describe('given an element with an uppercase attribute starting with the prefix and matching a lowercase type', function() {
 
-                    it('should convert the attribute name after the prefix to lowercase before calling the callback', function() {
+                    it('should call the callback with the correct type', function() {
 
                         var element = $('<div data-prefix-UPPERCASE="option: \'value\'"></div>').get(0);
                         var options = {option: 'value'};
                         var typeSpy = jasmine.createSpy('apply.to.callback.type');
 
-                        module.parseOptions = function() {
+                        internal.parseOptions = function() {
                             return options;
                         };
 
@@ -253,7 +251,7 @@ describe('declarative.apply', function() {
 
                     callbackSpy = jasmine.createSpy('apply.to.callback');
 
-                    module.mappings.get = function() {
+                    declarative.mappings.get = function() {
                         return {
                             id: 'some id',
                             prefix: 'prefix-',
@@ -269,7 +267,7 @@ describe('declarative.apply', function() {
 
                 it('should throw an error if the passed object is not a DOM object', function() {
 
-                    module.mappings.get = function() {
+                    declarative.mappings.get = function() {
                         return {};
                     };
 
@@ -284,7 +282,7 @@ describe('declarative.apply', function() {
 
                     var element = $('<prefix-type option="value"></prefix-type>').get(0);
 
-                    it('should call parseAttributeOptions passing in the the element', function() {
+                    it('should call getSpecifiedAttributes passing in the the element', function() {
 
                         testMethod('some id').to(element);
                         expect(getSpecifiedAttributesSpy).toHaveBeenCalledWith(element);
@@ -294,7 +292,7 @@ describe('declarative.apply', function() {
                     it('should call the mapping callback with the DOM element, the type identifier and the parsed options', function() {
 
                         var options = {option: 'value'};
-                        module.getSpecifiedAttributes = function() {
+                        internal.getSpecifiedAttributes = function() {
                             return options;
                         };
                         testMethod('some id').to(element);
@@ -310,7 +308,7 @@ describe('declarative.apply', function() {
                     var element = document.createElement('prefix-type');
                     parent.appendChild(element);
 
-                    it('should call parseAttributeOptions with the value of the attribute', function() {
+                    it('should call getSpecifiedAttributes with the value of the attribute', function() {
 
                         testMethod('some id').to(parent);
                         expect(getSpecifiedAttributesSpy).toHaveBeenCalledWith(element);
@@ -320,7 +318,7 @@ describe('declarative.apply', function() {
                     it('should call the mapping callback with the DOM element, the type identifier and the parsed options', function() {
 
                         var options = {option: 'value'};
-                        module.getSpecifiedAttributes = function() {
+                        internal.getSpecifiedAttributes = function() {
                             return options;
                         };
                         testMethod('some id').to(parent);
@@ -330,15 +328,15 @@ describe('declarative.apply', function() {
 
                 });
 
-                describe('given an element with a hyphenated name starting with the prefix and matching a type', function() {
+                describe('given a hyphenated element starting with the prefix and matching a type when converted to camel case', function() {
 
-                    it('should convert the element name after the prefix to camel case and call the callback', function() {
+                    it('should call the callback with the correct type', function() {
 
                         var element = $('<prefix-hyphenated-type option="value"></prefix-hyphenated-type>').get(0);
                         var options = {option: 'value'};
                         var typeSpy = jasmine.createSpy('apply.to.callback.type');
 
-                        module.getSpecifiedAttributes = function() {
+                        internal.getSpecifiedAttributes = function() {
                             return options;
                         };
 
@@ -354,15 +352,15 @@ describe('declarative.apply', function() {
 
                 });
 
-                describe('given an element with an uppercase name starting with the prefix', function() {
+                describe('given an uppercase element starting with the prefix and matching a lowercase type', function() {
 
-                    it('should convert the element name after the prefix to lowercase before calling the callback', function() {
+                    it('should call the callback with the correct type', function() {
 
                         var element = $('<prefix-UPPERCASE option="value"></prefix-UPPERCASE>').get(0);
                         var options = {option: 'value'};
                         var typeSpy = jasmine.createSpy('apply.to.callback.type');
 
-                        module.getSpecifiedAttributes = function() {
+                        internal.getSpecifiedAttributes = function() {
                             return options;
                         };
 

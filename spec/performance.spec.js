@@ -50,12 +50,14 @@ describe('performance', function() {
                     callback: logCallback});
             }
 
-            var startTime = new Date();
-
             var mappingIds = [];
             for (i = 0; i< countOfMappings; i++) {
                 mappingIds.push('test' + i);
             }
+
+            alert('starting test');
+
+            var startTime = new Date();
 
             declarative.apply(mappingIds).to(root);
 

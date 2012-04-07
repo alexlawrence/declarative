@@ -1,6 +1,6 @@
 /**
  * @license
- * declarative - Mapper for custom user interface markup - version 1.0.5
+ * declarative - Mapper for custom user interface markup - version 1.1.0
  *
  * Copyright 2012, Alex Lawrence
  * Licensed under the MIT license.
@@ -43,6 +43,17 @@ var internal = {};
 }());
 (function(){
 
+    internal.hyphenate = function(input) {
+        return input.replace(upperCaseRegex, function(completeMatch, character) {
+            return '-' + character.toLowerCase();
+        });
+    };
+
+    var upperCaseRegex = new RegExp(/([A-Z])/g);
+
+}());
+(function(){
+
     internal.isDOMElement = function(element) {
         return element &&
             (element.nodeType === ELEMENT_NODE || element.nodeType === DOCUMENT_NODE);
@@ -51,11 +62,117 @@ var internal = {};
     var ELEMENT_NODE = 1, DOCUMENT_NODE = 9;
 
 }());
+(function() {
+
+    internal.mappingModes = {
+        attribute: 'attribute',
+        element: 'element'
+    };
+
+}());
+(function() {
+
+    var mappingModes = internal.mappingModes;
+    var mappingUtilities = internal.mappingUtilities = {};
+
+    mappingUtilities.validateMapping = function(mapping) {
+        if (!mapping) {
+            generateError('invalid options');
+        }
+        if (!mapping.id) {
+            generateError('missing id');
+        }
+        if (!mapping.types) {
+            generateError('missing types');
+        }
+        if (mapping.types && !mapping.types.push) {
+            generateError('invalid types');
+        }
+        if (!mapping.callback || typeof mapping.callback !== 'function') {
+            generateError('invalid callback');
+        }
+        if (mapping.mappingMode && mapping.mappingMode !== mappingModes.attribute &&
+            mapping.mappingMode !== mappingModes.element) {
+            generateError('invalid mappingMode');
+        }
+    };
+
+    mappingUtilities.completeMapping = function(mapping) {
+        mapping.prefix = mapping.prefix || '';
+        mapping.mappingMode = mapping.mappingMode || mappingModes.attribute;
+    };
+
+    mappingUtilities.optimizeMapping = function(mapping) {
+        mapping.prefix = mapping.prefix.toLowerCase();
+        mapping.convertedTypes = [];
+        for (var i = 0, j = mapping.types.length; i < j; i++) {
+            var hyphenatedType = internal.hyphenate(mapping.types[i]);
+            mapping.convertedTypes.push(mapping.prefix + hyphenatedType);
+        }
+    };
+
+    var generateError = function( message) {
+        throw new Error('internal.mappingUtilities.validateMapping: ' + message);
+    };
+
+}());
+(function() {
+
+    var mappingModes = internal.mappingModes;
+
+    internal.generateCssSelectors = function(typesByMappingMode) {
+        var attributeSelectors = generateAttributeSelectors(typesByMappingMode[mappingModes.attribute]);
+        var elementSelectors = generateElementSelectors(typesByMappingMode[mappingModes.element]);
+        return combineSelectors(attributeSelectors, elementSelectors);
+    };
+
+    var generateAttributeSelectors = function(attributes) {
+        var attributeSelectors = attributes.join('],[');
+        if (attributeSelectors) {
+            attributeSelectors = '[' + attributeSelectors + ']';
+        }
+        return attributeSelectors;
+    };
+
+    var generateElementSelectors = function(elements) {
+        return elements.join(',');
+    };
+
+    var combineSelectors = function(left, right) {
+        return left + (left && right ? ',' : '') + right;
+    };
+
+}());
+(function(){
+
+    var mappingModes = internal.mappingModes;
+
+    internal.getRelevantElements = function(mappings, element) {
+        if (element.querySelectorAll) {
+            return getRelevantElementsByCssSelectors(mappings, element);
+        }
+        return element.all ? element.all : element.getElementsByTagName('*');
+    };
+
+    var getRelevantElementsByCssSelectors = function(mappings, element) {
+        var typesByMappingMode = {};
+        typesByMappingMode[mappingModes.attribute] = [];
+        typesByMappingMode[mappingModes.element] = [];
+        for (var i = 0, j = mappings.length; i < j; i++) {
+            var mapping = mappings[i], mappingMode = mapping.mappingMode;
+            typesByMappingMode[mappingMode] =
+                typesByMappingMode[mappingMode].concat(mapping.convertedTypes);
+        }
+        var selector = internal.generateCssSelectors(typesByMappingMode);
+        return element.querySelectorAll(selector);
+    };
+
+}());
 (function(){
 
     var isDOMElement = internal.isDOMElement;
 
-    declarative.getSpecifiedAttributes = function(element) {
+    internal.getSpecifiedAttributes = function(element) {
         verifyDOMElement(element);
         var attributes = element.attributes, attribute, specifiedAttributes = {};
         for (var i = 0, j = attributes.length; i < j; i++) {
@@ -76,7 +193,7 @@ var internal = {};
 }());
 (function() {
 
-    declarative.parseOptions = function(input) {
+    internal.parseOptions = function(input) {
         try {
             return parseUsingEval(input);
         }
@@ -99,13 +216,9 @@ var internal = {};
 
     var isArray = internal.array.isArray;
     var ensureArray = internal.array.ensureArray;
+    var mappingUtilities = internal.mappingUtilities;
 
     declarative.mappings = {};
-
-    var mappingModes = declarative.mappingModes = {
-        attribute: 'attribute',
-        element: 'element'
-    };
 
     declarative.mappings.clear = function() {
         mappings = {};
@@ -115,9 +228,9 @@ var internal = {};
         newMappings = ensureArray(newMappings);
         for (var i = 0, j = newMappings.length; i < j; i++) {
             var mapping = newMappings[i];
-            validateMapping(mapping);
-            completeMapping(mapping);
-            optimizeMapping(mapping);
+            mappingUtilities.validateMapping(mapping);
+            mappingUtilities.completeMapping(mapping);
+            mappingUtilities.optimizeMapping(mapping);
             mappings[mapping.id] = mapping;
         }
     };
@@ -144,69 +257,14 @@ var internal = {};
     };
 
     var getSingleMapping = function(id) {
-        mappings[id] || generateError('get', 'invalid id "' + id + '"');
-        return mappings[id];
-    };
-
-    var validateMapping = function(options) {
-        if (!options) {
-            generateError('add', 'invalid options');
-        }
-        if (!options.id) {
-            generateError('add', 'missing id');
-        }
-        if (!options.types) {
-            generateError('add', 'missing types');
-        }
-        if (options.types && !options.types.push) {
-            generateError('add', 'invalid types');
-        }
-        if (!options.callback || typeof options.callback !== 'function') {
-            generateError('add', 'invalid callback');
-        }
-        if (options.mappingMode &&
-            options.mappingMode !== mappingModes.attribute && options.mappingMode !== mappingModes.element) {
-            generateError('add', 'invalid mappingMode');
-        }
-        if (isDuplicate(options.id)) {
-            generateError('add', 'duplicate id "' + options.id + '"');
-        }
+        return mappings[id] || generateError('get', 'invalid id "' + id + '"');
     };
 
     var generateError = function(method, message) {
         throw new Error('declarative.mappings.' + method + ': ' + message);
     };
 
-    var isDuplicate = function(id) {
-        for (var mappingId in mappings) {
-            if (mappings.hasOwnProperty(mappingId) && mappingId == id) {
-                return true;
-            }
-        }
-        return false;
-    };
-
-    var completeMapping = function(mapping) {
-        mapping.prefix = mapping.prefix || '';
-        mapping.mappingMode = mapping.mappingMode || mappingModes.attribute;
-    };
-
-    var optimizeMapping = function(mapping) {
-        mapping.prefix = mapping.prefix.toLowerCase();
-        mapping.convertedTypes = [];
-        for (var i = 0, j = mapping.types.length; i < j; i++) {
-            var hyphenatedType = hyphenate(mapping.types[i]);
-            mapping.convertedTypes.push(mapping.prefix + hyphenatedType);
-        }
-    };
-
-    var hyphenate = function(input) {
-        return input.replace(upperCaseRegex, function(completeMatch, character) {
-            return '-' + character.toLowerCase();
-        });
-    };
-
-    var mappings = {}, upperCaseRegex = new RegExp(/([A-Z])/g);
+    var mappings = {};
 
 }());
 
@@ -214,46 +272,40 @@ var internal = {};
 (function() {
 
     var ensureArray = internal.array.ensureArray;
-    var isDOMElement = internal.isDOMElement;
-    var mappingModes = declarative.mappingModes;
+    var mappingModes = internal.mappingModes;
 
     declarative.apply = function(ids) {
         var mappings = declarative.mappings.get(ids);
         mappings = ensureArray(mappings);
-        return {
-            to: function(element) { apply(mappings, element); }
-        };
+        return applyMappingsToWrapper(mappings);
     };
 
     declarative.applyAllMappings = function() {
         var mappings = declarative.mappings.getAll();
+        return applyMappingsToWrapper(mappings);
+    };
+
+    var applyMappingsToWrapper = function(mappings) {
         return {
-            to: function(element) { apply(mappings, element); }
+            to: function(element) { applyMappingsTo(mappings, element); }
         }
     };
 
-    var apply = function(mappings, element) {
-        verifyDOMElement(element);
-        var allElements = getRelevantElements(mappings, element);
-        var mapping, elementIndex = allElements.length, attributes, attribute;
-        var i = 0, j = mappings.length, k = 0, m = 0, options;
+    var applyMappingsTo = function(mappings, rootElement) {
+        verifyDOMElement(rootElement);
+        var allElements = internal.getRelevantElements(mappings, rootElement), element = rootElement;
+        var mapping, elementIndex = allElements.length, attributes;
+        var mappingIndex = 0, j = mappings.length, typeIndex = 0, m = 0;
         while (element) {
             attributes = element.attributes;
-            for (i = 0; i < j; i++) {
-                mapping = mappings[i];
-                for (k = 0, m = mapping.convertedTypes.length; k < m; k++) {
+            for (mappingIndex = 0; mappingIndex < j; mappingIndex++) {
+                mapping = mappings[mappingIndex];
+                for (typeIndex = 0, m = mapping.convertedTypes.length; typeIndex < m; typeIndex++) {
                     if (mapping.mappingMode === mappingModes.attribute) {
-                        attribute = element.getAttributeNode && element.getAttributeNode(mapping.convertedTypes[k]);
-                        if (attribute && attribute.specified) {
-                            options = declarative.parseOptions(attribute.nodeValue);
-                            mapping.callback(element, mapping.types[k], options);
-                        }
+                        applyAttributeMapping(element, mapping, typeIndex);
                     }
                     if (mapping.mappingMode === mappingModes.element) {
-                        if (element.nodeName.toLowerCase() == mapping.convertedTypes[k]) {
-                            options = declarative.getSpecifiedAttributes(element);
-                            mapping.callback(element, mapping.types[k], options);
-                        }
+                        applyElementMapping(element, mapping, typeIndex);
                     }
                 }
             }
@@ -261,37 +313,24 @@ var internal = {};
         }
     };
 
-    var getRelevantElements = function(mappings, element) {
-        if (element.querySelectorAll) {
-            return getRelevantElementsBySelector(mappings, element);
-        }
-        return element.all ? element.all : element.getElementsByTagName('*');
-    };
-
-    var getRelevantElementsBySelector = function(mappings, element) {
-        var seekedByType = {};
-        seekedByType[mappingModes.attribute] = [];
-        seekedByType[mappingModes.element] = [];
-        for (var i = 0, j = mappings.length; i < j; i++) {
-            var mapping = mappings[i];
-            seekedByType[mapping.mappingMode] = seekedByType[mapping.mappingMode].concat(mapping.convertedTypes);
-        }
-        var selector = generateSelector(seekedByType);
-        return element.querySelectorAll(selector);
-    };
-
-    var generateSelector = function(seekedByType) {
-        var attributeSelector = seekedByType[mappingModes.attribute].join('],[');
-        if (attributeSelector) {
-            attributeSelector = '[' + attributeSelector + ']';
-        }
-        var elementSelector = seekedByType[mappingModes.element].join(',');
-        return attributeSelector + (attributeSelector && elementSelector ? ',' : '') + elementSelector;
-    };
-
     var verifyDOMElement = function(element) {
-        if (!isDOMElement(element)) {
+        if (!internal.isDOMElement(element)) {
             generateError('invalid element (DOM object required)');
+        }
+    };
+
+    var applyAttributeMapping = function(element, mapping, typeIndex) {
+        var attribute = element.getAttributeNode && element.getAttributeNode(mapping.convertedTypes[typeIndex]);
+        if (attribute && attribute.specified) {
+            var options = internal.parseOptions(attribute.nodeValue);
+            mapping.callback(element, mapping.types[typeIndex], options);
+        }
+    };
+
+    var applyElementMapping = function(element, mapping, typeIndex) {
+        if (element.nodeName.toLowerCase() == mapping.convertedTypes[typeIndex]) {
+            var options = internal.getSpecifiedAttributes(element);
+            mapping.callback(element, mapping.types[typeIndex], options);
         }
     };
 
@@ -302,7 +341,7 @@ var internal = {};
 }());
 
 
-declarative.version = '1.0.5';
+declarative.version = '1.1.0';
 
 return declarative;
 

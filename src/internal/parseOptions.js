@@ -1,6 +1,6 @@
 (function() {
 
-    declarative.parseOptions = function(input) {
+    internal.parseOptions = function(input) {
         try {
             return parseUsingEval(input);
         }

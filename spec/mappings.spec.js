@@ -1,6 +1,7 @@
 describe('declarative.mappings', function() {
 
     var subject = declarative.mappings;
+    var mappingUtilities = internal.mappingUtilities;
 
     beforeEach(function() {
         subject.clear();
@@ -8,201 +9,93 @@ describe('declarative.mappings', function() {
 
     describe('mappings.add', function() {
 
+        var originalValidateMapping = mappingUtilities.validateMapping;
+        var originalCompleteMapping = mappingUtilities.completeMapping;
+        var originalOptimizeMapping = mappingUtilities.optimizeMapping;
+        var validateMappingSpy;
+        var completeMappingSpy;
+        var optimizeMappingSpy;
+
+        beforeEach(function() {
+            validateMappingSpy = jasmine.createSpy('internal.mappingUtilities.validateMapping');
+            completeMappingSpy = jasmine.createSpy('internal.mappingUtilities.completeMapping');
+            optimizeMappingSpy = jasmine.createSpy('internal.mappingUtilities.optimizeMapping');
+            mappingUtilities.validateMapping = validateMappingSpy;
+            mappingUtilities.completeMapping = completeMappingSpy;
+            mappingUtilities.optimizeMapping = optimizeMappingSpy;
+        });
+
+        afterEach(function() {
+            mappingUtilities.validateMapping = originalValidateMapping;
+            mappingUtilities.completeMapping = originalCompleteMapping;
+            mappingUtilities.optimizeMapping = originalOptimizeMapping;
+        });
+
         describe('given a single mapping entry', function() {
 
-            it('should throw an error if the mapping is undefined', function() {
+            var mapping;
 
-                expect(function() {
-                    subject.add();
-                }).toThrow('declarative.mappings.add: invalid options');
+            beforeEach(function() {
 
-            });
-
-            it('should throw an error if the mapping contains no id property', function() {
-
-                expect(function() {
-                    subject.add({});
-                }).toThrow('declarative.mappings.add: missing id');
+                mapping = {
+                    id: 'some id',
+                    types: ['foo', 'bar'],
+                    callback: function() {}
+                };
+                subject.add(mapping);
 
             });
 
-            it('should throw an error if the mapping contains no types', function() {
-
-                expect(function() {
-                    subject.add({
-                        id: 'some id'
-                    });
-                }).toThrow('declarative.mappings.add: missing types');
-
+            it('should call internal.mappingUtilities.validateMapping for the given mapping', function() {
+                expect(validateMappingSpy).toHaveBeenCalledWith(mapping);
             });
 
-            it('should throw an error if the passed in types is not an array', function() {
-
-                expect(function() {
-                    subject.add({
-                        id: 'some id',
-                        types: 'foobar'
-                    });
-                }).toThrow('declarative.mappings.add: invalid types');
-
+            it('should call internal.mappingUtilities.completeMapping for the given mapping', function() {
+                expect(completeMappingSpy).toHaveBeenCalledWith(mapping);
             });
 
-            it('should throw an error if the mapping contains no callback', function() {
-
-                expect(function() {
-                    subject.add({
-                        id: 'some id',
-                        prefix: 'data-',
-                        types: ['foo', 'bar']
-                    });
-                }).toThrow('declarative.mappings.add: invalid callback');
-
-            });
-
-            it('should not throw an error if the mapping contains an id, a types array and a callback', function() {
-
-                expect(function() {
-                    subject.add({
-                        id: 'some id',
-                        types: ['foo', 'bar'],
-                        callback: function() {}
-                    });
-                }).not.toThrow();
-
-            });
-
-            it('should throw an error if the passed in id matches another mapping id already added', function() {
-
-                expect(function() {
-                    subject.add({
-                        id: 'some id',
-                        types: ['foo', 'bar'],
-                        callback: function() {}
-                    });
-                    subject.add({
-                        id: 'some id',
-                        types: ['foo', 'bar'],
-                        callback: function() {}
-                    });
-                }).toThrow('declarative.mappings.add: duplicate id "some id"');
-
-            });
-
-            it('should not throw an error if the mapping contains a mappingMode property of "attribute"', function() {
-
-                expect(function() {
-                    subject.add({
-                        id: 'some id',
-                        types: ['foo', 'bar'],
-                        mappingMode: 'attribute',
-                        callback: function() {}
-                    });
-                }).not.toThrow();
-
-            });
-
-            it('should not throw an error if the mapping contains a mappingMode property of "element"', function() {
-
-                expect(function() {
-                    subject.add({
-                        id: 'some id',
-                        types: ['foo', 'bar'],
-                        mappingMode: 'element',
-                        callback: function() {}
-                    });
-                }).not.toThrow();
-
-            });
-
-            it('should throw an error if the mappings contains an invalid mappingMode property"', function() {
-
-                expect(function() {
-                    subject.add({
-                        id: 'some id',
-                        types: ['foo', 'bar'],
-                        mappingMode: 'foobar',
-                        callback: function() {}
-                    });
-                }).toThrow('declarative.mappings.add: invalid mappingMode');
-
+            it('should call internal.mappingUtilities.optimizeMapping for the given mapping', function() {
+                expect(optimizeMappingSpy).toHaveBeenCalledWith(mapping);
             });
 
         });
 
         describe('given a list of two mapping entries', function() {
 
-            var validMapping = {
-                id: 'some other id',
-                types: ['foo', 'bar'],
-                callback: function() {}
-            };
+            var mapping1, mapping2;
 
-            it('should throw an error if one mapping is undefined', function() {
+            beforeEach(function() {
 
-                expect(function() {
-                    subject.add([undefined, validMapping]);
-                }).toThrow('declarative.mappings.add: invalid options');
-
-            });
-
-            it('should throw an error if one contains no id property', function() {
-
-                expect(function() {
-                    subject.add([{}, validMapping]);
-                }).toThrow('declarative.mappings.add: missing id');
+                mapping1 = {
+                    id: 'id 1',
+                    types: ['foo', 'bar'],
+                    callback: function() {}
+                };
+                mapping2 = {
+                    id: 'id 2',
+                    types: ['foo', 'bar'],
+                    callback: function() {}
+                };
+                subject.add([mapping1, mapping2]);
 
             });
 
-            it('should throw an error if one contains no types', function() {
-
-                expect(function() {
-                    subject.add([{
-                        id: 'some id'
-                    }, validMapping]);
-                }).toThrow('declarative.mappings.add: missing types');
-
+            it('should call internal.mappingUtilities.validateMapping for each given mapping', function() {
+                expect(validateMappingSpy).toHaveBeenCalledWith(mapping1);
+                expect(validateMappingSpy).toHaveBeenCalledWith(mapping2);
             });
 
-            it('should throw an error if one contains types with type other than an array', function() {
-
-                expect(function() {
-                    subject.add([{
-                        id: 'some id',
-                        types: 'foobar'
-                    }, validMapping]);
-                }).toThrow('declarative.mappings.add: invalid types');
-
+            it('should call internal.mappingUtilities.completeMapping for each given mapping', function() {
+                expect(completeMappingSpy).toHaveBeenCalledWith(mapping1);
+                expect(completeMappingSpy).toHaveBeenCalledWith(mapping2);
             });
 
-            it('should throw an error if the mapping contains no callback', function() {
-
-                expect(function() {
-                    subject.add([{
-                        id: 'some id',
-                        types: ['foo', 'bar']
-                    }, validMapping]);
-                }).toThrow('declarative.mappings.add: invalid callback');
-
-            });
-
-            it('should not throw an error if both contain an id and a types array', function() {
-
-                expect(function() {
-                    subject.add([{
-                        id: 'some id',
-                        types: ['foo', 'bar'],
-                        callback: function() {}
-                    }, {
-                        id: 'some other id',
-                        types: ['foo', 'bar'],
-                        callback: function() {}
-                    }]);
-                }).not.toThrow();
-
+            it('should call internal.mappingUtilities.completeMapping for each given mapping', function() {
+                expect(optimizeMappingSpy).toHaveBeenCalledWith(mapping1);
+                expect(optimizeMappingSpy).toHaveBeenCalledWith(mapping2);
             });
 
         });
-
 
     });
 
@@ -233,78 +126,6 @@ describe('declarative.mappings', function() {
                 expect(result.prefix).toBe('data-');
                 expect(result.types[0]).toBe('calendar');
                 expect(typeof result.callback).toBe('function');
-
-            });
-
-            it('should have added a mappingMode property with value "attribute" when returning the mapping', function() {
-
-                subject.add({
-                    id: 'some id',
-                    types: ['calendar'],
-                    callback: function() {}
-                });
-
-                var result = subject.get('some id');
-                expect(result.mappingMode).toBe('attribute');
-
-            });
-
-            it('should have added an empty string as prefix if no prefix was given when returning the mapping', function() {
-
-                subject.add({
-                    id: 'some id',
-                    types: ['calendar'],
-                    callback: function() {}
-                });
-
-                var result = subject.get('some id');
-                expect(result.prefix).toBe('');
-
-            });
-
-            it('should have transformed the prefix to lowercase when returning the mapping', function() {
-
-                subject.add({
-                    id: 'some id',
-                    prefix: 'someMixedCase',
-                    types: ['calendar'],
-                    callback: function() {}
-                });
-
-                var result = subject.get('some id');
-                expect(result.prefix).toBe('somemixedcase');
-
-            });
-
-            it('should have added a convertedTypes object which contains all types combined with the prefix', function() {
-
-                subject.add({
-                    id: 'some id',
-                    prefix: 'prefix-',
-                    types: ['calendar', 'counter'],
-                    callback: function() {}
-                });
-
-                var result = subject.get('some id');
-                expect(result.convertedTypes).toBeDefined();
-                expect(result.convertedTypes[0]).toBe('prefix-calendar');
-                expect(result.convertedTypes[1]).toBe('prefix-counter');
-
-            });
-
-            it('should have transformed all camel case types to hyphenated string in the convertedTypes array', function() {
-
-                subject.add({
-                    id: 'some id',
-                    prefix: 'prefix-',
-                    types: ['someCasing', 'hereAlso'],
-                    callback: function() {}
-                });
-
-                var result = subject.get('some id');
-                expect(result.convertedTypes).toBeDefined();
-                expect(result.convertedTypes[0]).toContain('some-casing');
-                expect(result.convertedTypes[1]).toContain('here-also');
 
             });
 

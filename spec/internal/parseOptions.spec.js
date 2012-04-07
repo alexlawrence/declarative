@@ -1,6 +1,6 @@
-describe('declarative.parseOptions', function() {
+describe('internal.parseOptions', function() {
 
-    var testMethod = declarative.parseOptions;
+    var testMethod = internal.parseOptions;
 
     it('should convert an empty string to an empty object', function() {
 

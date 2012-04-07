@@ -2,7 +2,7 @@
 
     var isDOMElement = internal.isDOMElement;
 
-    declarative.getSpecifiedAttributes = function(element) {
+    internal.getSpecifiedAttributes = function(element) {
         verifyDOMElement(element);
         var attributes = element.attributes, attribute, specifiedAttributes = {};
         for (var i = 0, j = attributes.length; i < j; i++) {
