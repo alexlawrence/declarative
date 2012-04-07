@@ -126,6 +126,13 @@ Applying the above mapping to the whole DOM is done by writing the following:
 declarative.apply('counter').to(document);
 ```
 
+**Note:** HTML attributes are not case sensitive.
+declarative automatically transforms hyphenated attribute names to camel case when matching against mapping types.
+This is the same behavior as building the dataset attribute from HTML data-* attributes defined
+<a href="http://dev.w3.org/html5/spec/single-page.html#embedding-custom-non-visible-data-with-the-data-attributes">here</a>.
+
+
+
 ###API
 
 Adding mappings:
