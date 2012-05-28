@@ -1,6 +1,6 @@
 /**
  * @license
- * declarative - Mapper for custom user interface markup - version 1.1.0
+ * declarative - Mapper for custom user interface markup - version 1.2.6
  *
  * Copyright 2012, Alex Lawrence
  * Licensed under the MIT license.
@@ -17,11 +17,37 @@
     }
 }(this, function () {
 
-var declarative = {};
-var internal = {};
-(function() {
+function define(a,b,c){define[a]=require(c?b:[],c||b)}function require(a,b){for(var c=[],d;d=a.shift();)c.push(define[d]);return b.apply({},c)}
+define('common/errors', function() {
 
-    var array = internal.array = {};
+    var errors = {};
+    errors.parseOptions = 'declarative: Error parsing options';
+    errors.verifyDomElement = 'declarative: Invalid DOM element given';
+    errors.getSingleMapping = 'declarative: Mapping id not existing';
+    errors.validateMapping = 'declarative: Invalid mapping options';
+    errors.validateMappingId = 'declarative: Invalid mapping id';
+    errors.validateMappingTypes = 'declarative: Missing mapping types';
+    errors.validateMappingTypesFormat = 'declarative: Invalid mapping types';
+    errors.validateMappingCallback = 'declarative: Invalid mapping callback';
+    errors.validateMappingMode = 'declarative: Invalid mappingMode';
+
+    return errors;
+
+});
+define('common/mappingModes', function() {
+
+    var mappingModes = {
+        attribute: 'attribute',
+        element: 'element'
+    };
+
+    return mappingModes;
+
+});
+
+
+define('common/array', function() {
+    var array = {};
 
     array.ensureArray = function(value) {
         return array.isArray(value) ? value : [value];
@@ -40,87 +66,53 @@ var internal = {};
         return -1;
     };
 
-}());
-(function(){
+    return array;
+});
 
-    internal.hyphenate = function(input) {
+
+define('common/hyphenate', function(){
+
+    var upperCaseRegex = new RegExp(/([A-Z])/g);
+
+    var hyphenate = function(input) {
         return input.replace(upperCaseRegex, function(completeMatch, character) {
             return '-' + character.toLowerCase();
         });
     };
 
-    var upperCaseRegex = new RegExp(/([A-Z])/g);
+    return hyphenate;
 
-}());
-(function(){
+});
+define('common/parseOptions', ['common/errors'], function(errors) {
 
-    internal.isDOMElement = function(element) {
+    var parseOptions = function(input) {
+        try {
+            var output;
+            return eval('output = {' + input + '}');
+        }
+        catch (error) {
+            throw new Error(errors.parseOptions);
+        }
+    };
+
+    return parseOptions;
+
+});
+define('dom/isDomElement', function() {
+
+    var isDomElement = function(element) {
         return element &&
             (element.nodeType === ELEMENT_NODE || element.nodeType === DOCUMENT_NODE);
     };
 
     var ELEMENT_NODE = 1, DOCUMENT_NODE = 9;
 
-}());
-(function() {
+    return isDomElement;
 
-    internal.mappingModes = {
-        attribute: 'attribute',
-        element: 'element'
-    };
+});
+define('dom/generateCssSelectors', ['common/mappingModes'], function(mappingModes) {
 
-}());
-(function() {
-
-    var mappingModes = internal.mappingModes;
-    var mappingUtilities = internal.mappingUtilities = {};
-
-    mappingUtilities.validateMapping = function(mapping) {
-        if (!mapping) {
-            generateError('invalid options');
-        }
-        if (!mapping.id) {
-            generateError('missing id');
-        }
-        if (!mapping.types) {
-            generateError('missing types');
-        }
-        if (mapping.types && !mapping.types.push) {
-            generateError('invalid types');
-        }
-        if (!mapping.callback || typeof mapping.callback !== 'function') {
-            generateError('invalid callback');
-        }
-        if (mapping.mappingMode && mapping.mappingMode !== mappingModes.attribute &&
-            mapping.mappingMode !== mappingModes.element) {
-            generateError('invalid mappingMode');
-        }
-    };
-
-    mappingUtilities.completeMapping = function(mapping) {
-        mapping.prefix = mapping.prefix || '';
-        mapping.mappingMode = mapping.mappingMode || mappingModes.attribute;
-    };
-
-    mappingUtilities.optimizeMapping = function(mapping) {
-        mapping.prefix = mapping.prefix.toLowerCase();
-        mapping.convertedTypes = [];
-        for (var i = 0, j = mapping.types.length; i < j; i++) {
-            var hyphenatedType = internal.hyphenate(mapping.types[i]);
-            mapping.convertedTypes.push(mapping.prefix + hyphenatedType);
-        }
-    };
-
-    var generateError = function( message) {
-        throw new Error('internal.mappingUtilities.validateMapping: ' + message);
-    };
-
-}());
-(function() {
-
-    var mappingModes = internal.mappingModes;
-
-    internal.generateCssSelectors = function(typesByMappingMode) {
+    var generateCssSelectors = function(typesByMappingMode) {
         var attributeSelectors = generateAttributeSelectors(typesByMappingMode[mappingModes.attribute]);
         var elementSelectors = generateElementSelectors(typesByMappingMode[mappingModes.element]);
         return combineSelectors(attributeSelectors, elementSelectors);
@@ -142,37 +134,40 @@ var internal = {};
         return left + (left && right ? ',' : '') + right;
     };
 
-}());
-(function(){
+    return generateCssSelectors;
 
-    var mappingModes = internal.mappingModes;
+});
+define('dom/getRelevantElements',
+    ['common/mappingModes', 'dom/generateCssSelectors'],
+    function(mappingModes, generateCssSelectors) {
 
-    internal.getRelevantElements = function(mappings, element) {
-        if (element.querySelectorAll) {
-            return getRelevantElementsByCssSelectors(mappings, element);
-        }
-        return element.all ? element.all : element.getElementsByTagName('*');
-    };
+        var getRelevantElements = function(element, mappings) {
+            if (element.querySelectorAll) {
+                return getRelevantElementsByCssSelectors(element, mappings);
+            }
+            return element.all ? element.all : element.getElementsByTagName('*');
+        };
 
-    var getRelevantElementsByCssSelectors = function(mappings, element) {
-        var typesByMappingMode = {};
-        typesByMappingMode[mappingModes.attribute] = [];
-        typesByMappingMode[mappingModes.element] = [];
-        for (var i = 0, j = mappings.length; i < j; i++) {
-            var mapping = mappings[i], mappingMode = mapping.mappingMode;
-            typesByMappingMode[mappingMode] =
-                typesByMappingMode[mappingMode].concat(mapping.convertedTypes);
-        }
-        var selector = internal.generateCssSelectors(typesByMappingMode);
-        return element.querySelectorAll(selector);
-    };
+        var getRelevantElementsByCssSelectors = function(element, mappings) {
+            var typesByMappingMode = {};
+            typesByMappingMode[mappingModes.attribute] = [];
+            typesByMappingMode[mappingModes.element] = [];
+            for (var i = 0, j = mappings.length; i < j; i++) {
+                var mapping = mappings[i], mappingMode = mapping.mappingMode;
+                typesByMappingMode[mappingMode] =
+                    typesByMappingMode[mappingMode].concat(mapping.convertedTypes);
+            }
+            var selector = generateCssSelectors(typesByMappingMode);
+            return element.querySelectorAll(selector);
+        };
 
-}());
-(function(){
+        return getRelevantElements;
 
-    var isDOMElement = internal.isDOMElement;
+    }
+);
+define('dom/getSpecifiedAttributes', ['common/errors', 'dom/isDomElement'], function(errors, isDomElement) {
 
-    internal.getSpecifiedAttributes = function(element) {
+    var getSpecifiedAttributes = function(element) {
         verifyDOMElement(element);
         var attributes = element.attributes, attribute, specifiedAttributes = {};
         for (var i = 0, j = attributes.length; i < j; i++) {
@@ -185,68 +180,103 @@ var internal = {};
     };
 
     var verifyDOMElement = function(element) {
-        if (!isDOMElement(element)) {
-            throw new Error('declarative.getSpecifiedAttributes: invalid element (DOM element required)');
+        if (!isDomElement(element)) {
+            throw new Error(errors.verifyDomElement);
         }
     };
 
-}());
-(function() {
+    return getSpecifiedAttributes;
 
-    internal.parseOptions = function(input) {
-        try {
-            return parseUsingEval(input);
-        }
-        catch (error) {
-            generateError('Parsing error');
-        }
-    };
+});
+define('processing/validateMapping', ['common/errors', 'common/mappingModes'], function(errors, mappingModes) {
 
-    var parseUsingEval = function(input) {
-        var output;
-        return eval('output = {' + input + '}');
+    var validateMapping = function(mapping) {
+        if (!mapping) {
+            generateError(errors.validateMapping);
+        }
+        if (!mapping.id) {
+            generateError(errors.validateMappingId);
+        }
+        if (!mapping.types) {
+            generateError(errors.validateMappingTypes);
+        }
+        if (mapping.types && !mapping.types.push) {
+            generateError(errors.validateMappingTypesFormat);
+        }
+        if (!mapping.callback || typeof mapping.callback !== 'function') {
+            generateError(errors.validateMappingCallback);
+        }
+        if (mapping.mappingMode && mapping.mappingMode !== mappingModes.attribute &&
+            mapping.mappingMode !== mappingModes.element) {
+            generateError(errors.validateMappingMode);
+        }
     };
 
     var generateError = function(message) {
-        throw new Error('declarative.parseOptions: ' + message);
+        throw new Error(message);
     };
 
-}());
-(function() {
+    return validateMapping;
 
-    var isArray = internal.array.isArray;
-    var ensureArray = internal.array.ensureArray;
-    var mappingUtilities = internal.mappingUtilities;
+});
+define('processing/completeMapping', ['common/mappingModes'], function(mappingModes) {
 
-    declarative.mappings = {};
-
-    declarative.mappings.clear = function() {
-        mappings = {};
+    var completeMapping = function(mapping) {
+        mapping.prefix = mapping.prefix || '';
+        mapping.mappingMode = mapping.mappingMode || mappingModes.attribute;
+        mapping.distinct = (mapping.distinct !== undefined) ? mapping.distinct : true;
     };
 
-    declarative.mappings.add = function(newMappings) {
-        newMappings = ensureArray(newMappings);
-        for (var i = 0, j = newMappings.length; i < j; i++) {
-            var mapping = newMappings[i];
-            mappingUtilities.validateMapping(mapping);
-            mappingUtilities.completeMapping(mapping);
-            mappingUtilities.optimizeMapping(mapping);
-            mappings[mapping.id] = mapping;
+    return completeMapping;
+
+});
+define('processing/optimizeMapping', ['common/hyphenate'], function(hyphenate) {
+
+    var optimizeMapping = function(mapping) {
+        mapping.prefix = mapping.prefix.toLowerCase();
+        mapping.convertedTypes = [];
+        for (var i = 0, j = mapping.types.length; i < j; i++) {
+            var hyphenatedType = hyphenate(mapping.types[i]);
+            mapping.convertedTypes.push(mapping.prefix + hyphenatedType);
         }
     };
 
-    declarative.mappings.getAll = function() {
+    return optimizeMapping;
+
+});
+define('mappings',
+    ['common/errors', 'common/array', 'processing/validateMapping', 'processing/completeMapping', 'processing/optimizeMapping'],
+    function(errors, array, validateMapping, completeMapping, optimizeMapping) {
+
+    var mappings = {};
+
+    mappings.clear = function() {
+        registeredMappings = {};
+    };
+
+    mappings.add = function(newMappings) {
+        newMappings = array.ensureArray(newMappings);
+        for (var i = 0, j = newMappings.length; i < j; i++) {
+            var mapping = newMappings[i];
+            validateMapping(mapping);
+            completeMapping(mapping);
+            optimizeMapping(mapping);
+            registeredMappings[mapping.id] = mapping;
+        }
+    };
+
+    mappings.getAll = function() {
         var mappingsList = [];
-        for (var property in mappings) {
-            if (mappings.hasOwnProperty(property)) {
-                mappingsList.push(mappings[property]);
+        for (var property in registeredMappings) {
+            if (registeredMappings.hasOwnProperty(property)) {
+                mappingsList.push(registeredMappings[property]);
             }
         }
         return mappingsList;
     };
 
-    declarative.mappings.get = function (ids) {
-        if (!isArray(ids)) {
+    mappings.get = function (ids) {
+        if (!array.isArray(ids)) {
             return getSingleMapping(ids);
         }
         var matches = [];
@@ -257,91 +287,139 @@ var internal = {};
     };
 
     var getSingleMapping = function(id) {
-        return mappings[id] || generateError('get', 'invalid id "' + id + '"');
+        return registeredMappings[id] || throwNewError();
     };
 
-    var generateError = function(method, message) {
-        throw new Error('declarative.mappings.' + method + ': ' + message);
+    var throwNewError = function() {
+        throw new Error(errors.getSingleMapping);
     };
 
-    var mappings = {};
+    var registeredMappings = {};
 
-}());
+        return mappings;
+
+});
 
 
-(function() {
+define('applyMappingsTo',
+    ['common/array', 'common/errors', 'common/parseOptions', 'common/mappingModes',
+        'dom/isDomElement', 'dom/getRelevantElements', 'dom/getSpecifiedAttributes'],
+    function(array, errors, parseOptions, mappingModes,
+             isDomElement, getRelevantElements, getSpecifiedAttributes) {
 
-    var ensureArray = internal.array.ensureArray;
-    var mappingModes = internal.mappingModes;
+        var applyMappingsToWrapper = function(mappings) {
+            return {
+                to: function(element) { applyMappingsTo(mappings, element); }
+            }
+        };
 
-    declarative.apply = function(ids) {
-        var mappings = declarative.mappings.get(ids);
-        mappings = ensureArray(mappings);
-        return applyMappingsToWrapper(mappings);
-    };
-
-    declarative.applyAllMappings = function() {
-        var mappings = declarative.mappings.getAll();
-        return applyMappingsToWrapper(mappings);
-    };
-
-    var applyMappingsToWrapper = function(mappings) {
-        return {
-            to: function(element) { applyMappingsTo(mappings, element); }
-        }
-    };
-
-    var applyMappingsTo = function(mappings, rootElement) {
-        verifyDOMElement(rootElement);
-        var allElements = internal.getRelevantElements(mappings, rootElement), element = rootElement;
-        var mapping, elementIndex = allElements.length, attributes;
-        var mappingIndex = 0, j = mappings.length, typeIndex = 0, m = 0;
-        while (element) {
-            attributes = element.attributes;
-            for (mappingIndex = 0; mappingIndex < j; mappingIndex++) {
-                mapping = mappings[mappingIndex];
-                for (typeIndex = 0, m = mapping.convertedTypes.length; typeIndex < m; typeIndex++) {
-                    if (mapping.mappingMode === mappingModes.attribute) {
-                        applyAttributeMapping(element, mapping, typeIndex);
-                    }
-                    if (mapping.mappingMode === mappingModes.element) {
-                        applyElementMapping(element, mapping, typeIndex);
+        var applyMappingsTo = function(mappings, rootElement) {
+            verifyDomElement(rootElement);
+            var allElements = getRelevantElements(rootElement, mappings);
+            var mapping, attributes, elementIndex = allElements.length;
+            var element = rootElement != document ? rootElement : allElements[--elementIndex];
+            var mappingIndex = 0, j = mappings.length, typeIndex = 0, m = 0;
+            while (element) {
+                attributes = element.attributes;
+                for (mappingIndex = 0; mappingIndex < j; mappingIndex++) {
+                    mapping = mappings[mappingIndex];
+                    for (typeIndex = 0, m = mapping.convertedTypes.length; typeIndex < m; typeIndex++) {
+                        if (elementShouldNotBeMapped(mapping, element, mapping.convertedTypes[typeIndex])) {
+                            continue;
+                        }
+                        if (mapping.mappingMode === mappingModes.attribute) {
+                            applyAttributeMapping(element, mapping, typeIndex);
+                        }
+                        if (mapping.mappingMode === mappingModes.element) {
+                            applyElementMapping(element, mapping, typeIndex);
+                        }
                     }
                 }
+                element = elementIndex && allElements[--elementIndex];
             }
-            element = elementIndex && allElements[--elementIndex];
-        }
-    };
+        };
 
-    var verifyDOMElement = function(element) {
-        if (!internal.isDOMElement(element)) {
-            generateError('invalid element (DOM object required)');
-        }
-    };
+        var verifyDomElement = function(element) {
+            if (!isDomElement(element)) {
+                throw new Error(errors.verifyDomElement);
+            }
+        };
 
-    var applyAttributeMapping = function(element, mapping, typeIndex) {
-        var attribute = element.getAttributeNode && element.getAttributeNode(mapping.convertedTypes[typeIndex]);
-        if (attribute && attribute.specified) {
-            var options = internal.parseOptions(attribute.nodeValue);
-            mapping.callback(element, mapping.types[typeIndex], options);
-        }
-    };
+        var elementShouldNotBeMapped = function(mapping, element, type) {
+            var id = element.getAttribute(idAttributeName);
+            return mapping.distinct && (id > 0) && array.indexOf(appliedMappings[id], type) > -1;
+        };
 
-    var applyElementMapping = function(element, mapping, typeIndex) {
-        if (element.nodeName.toLowerCase() == mapping.convertedTypes[typeIndex]) {
-            var options = internal.getSpecifiedAttributes(element);
-            mapping.callback(element, mapping.types[typeIndex], options);
-        }
-    };
+        var applyAttributeMapping = function(element, mapping, typeIndex) {
+            var attribute = element.getAttributeNode(mapping.convertedTypes[typeIndex]);
+            if (attribute && attribute.specified) {
+                var options = parseOptions(attribute.nodeValue);
+                mapping.callback(element, mapping.types[typeIndex], options);
+                saveAppliedMappingInfo(element, mapping, mapping.types[typeIndex]);
+            }
+        };
 
-    var generateError = function(message) {
-        throw new Error('declarative.apply.to: ' + message);
-    };
+        var applyElementMapping = function(element, mapping, typeIndex) {
+            if (element.nodeName.toLowerCase() == mapping.convertedTypes[typeIndex]) {
+                var options = getSpecifiedAttributes(element);
+                mapping.callback(element, mapping.types[typeIndex], options);
+                saveAppliedMappingInfo(element, mapping, mapping.types[typeIndex]);
+            }
+        };
 
-}());
+        var saveAppliedMappingInfo = function(element, mapping, type) {
+            if (mapping.distinct) {
+                var id = element.getAttribute(idAttributeName);
+                if (!id) {
+                    id = currentId++;
+                    element.setAttribute(idAttributeName, id);
+                }
+                appliedMappings[id] = appliedMappings[id] || [];
+                appliedMappings[id].push(type);
+            }
+        };
+
+        var appliedMappings = {}, idAttributeName = 'data-declarative-id', currentId = 1;
+
+        return applyMappingsToWrapper;
+
+    }
+);
+define('apply',
+    ['common/array', 'mappings', 'applyMappingsTo'],
+    function(array, mappings, applyMappingsToWrapper) {
+
+        return function (ids) {
+            var mappingsToApply = mappings.get(ids);
+            mappingsToApply = array.ensureArray(mappingsToApply);
+            return applyMappingsToWrapper(mappingsToApply);
+        };
+
+    }
+);
+define('applyAllMappings',
+    ['mappings', 'applyMappingsTo'],
+    function( mappings, applyMappingsTo) {
+
+        return function () {
+            return applyMappingsTo(mappings.getAll());
+        };
+
+    }
+);
+var declarative = {};
+require(
+    ['common/mappingModes', 'mappings', 'apply', 'applyAllMappings'],
+    function(mappingModes, mappings, apply, applyAllMappings) {
+        declarative.mappingModes = mappingModes;
+        declarative.mappings = mappings;
+        declarative.apply = apply;
+        declarative.applyAllMappings = applyAllMappings;
+    }
+);
 
 
-declarative.version = '1.1.0';
+declarative.version = '1.2.6';
 
 return declarative;
 

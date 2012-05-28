@@ -1,38 +1,36 @@
-(function() {
+define('mappings',
+    ['common/errors', 'common/array', 'processing/validateMapping', 'processing/completeMapping', 'processing/optimizeMapping'],
+    function(errors, array, validateMapping, completeMapping, optimizeMapping) {
 
-    var isArray = internal.array.isArray;
-    var ensureArray = internal.array.ensureArray;
-    var mappingUtilities = internal.mappingUtilities;
+    var mappings = {};
 
-    declarative.mappings = {};
-
-    declarative.mappings.clear = function() {
-        mappings = {};
+    mappings.clear = function() {
+        registeredMappings = {};
     };
 
-    declarative.mappings.add = function(newMappings) {
-        newMappings = ensureArray(newMappings);
+    mappings.add = function(newMappings) {
+        newMappings = array.ensureArray(newMappings);
         for (var i = 0, j = newMappings.length; i < j; i++) {
             var mapping = newMappings[i];
-            mappingUtilities.validateMapping(mapping);
-            mappingUtilities.completeMapping(mapping);
-            mappingUtilities.optimizeMapping(mapping);
-            mappings[mapping.id] = mapping;
+            validateMapping(mapping);
+            completeMapping(mapping);
+            optimizeMapping(mapping);
+            registeredMappings[mapping.id] = mapping;
         }
     };
 
-    declarative.mappings.getAll = function() {
+    mappings.getAll = function() {
         var mappingsList = [];
-        for (var property in mappings) {
-            if (mappings.hasOwnProperty(property)) {
-                mappingsList.push(mappings[property]);
+        for (var property in registeredMappings) {
+            if (registeredMappings.hasOwnProperty(property)) {
+                mappingsList.push(registeredMappings[property]);
             }
         }
         return mappingsList;
     };
 
-    declarative.mappings.get = function (ids) {
-        if (!isArray(ids)) {
+    mappings.get = function (ids) {
+        if (!array.isArray(ids)) {
             return getSingleMapping(ids);
         }
         var matches = [];
@@ -43,14 +41,16 @@
     };
 
     var getSingleMapping = function(id) {
-        return mappings[id] || generateError('get', 'invalid id "' + id + '"');
+        return registeredMappings[id] || throwNewError();
     };
 
-    var generateError = function(method, message) {
-        throw new Error('declarative.mappings.' + method + ': ' + message);
+    var throwNewError = function() {
+        throw new Error(errors.getSingleMapping);
     };
 
-    var mappings = {};
+    var registeredMappings = {};
 
-}());
+        return mappings;
+
+});
 

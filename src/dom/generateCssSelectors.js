@@ -1,8 +1,6 @@
-(function() {
+define('dom/generateCssSelectors', ['common/mappingModes'], function(mappingModes) {
 
-    var mappingModes = internal.mappingModes;
-
-    internal.generateCssSelectors = function(typesByMappingMode) {
+    var generateCssSelectors = function(typesByMappingMode) {
         var attributeSelectors = generateAttributeSelectors(typesByMappingMode[mappingModes.attribute]);
         var elementSelectors = generateElementSelectors(typesByMappingMode[mappingModes.element]);
         return combineSelectors(attributeSelectors, elementSelectors);
@@ -24,4 +22,6 @@
         return left + (left && right ? ',' : '') + right;
     };
 
-}());
+    return generateCssSelectors;
+
+});

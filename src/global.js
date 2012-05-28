@@ -1,2 +1,0 @@
-var declarative = {};
-var internal = {};

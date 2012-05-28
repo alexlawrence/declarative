@@ -1,8 +1,6 @@
-(function(){
+define('dom/getSpecifiedAttributes', ['common/errors', 'dom/isDomElement'], function(errors, isDomElement) {
 
-    var isDOMElement = internal.isDOMElement;
-
-    internal.getSpecifiedAttributes = function(element) {
+    var getSpecifiedAttributes = function(element) {
         verifyDOMElement(element);
         var attributes = element.attributes, attribute, specifiedAttributes = {};
         for (var i = 0, j = attributes.length; i < j; i++) {
@@ -15,9 +13,11 @@
     };
 
     var verifyDOMElement = function(element) {
-        if (!isDOMElement(element)) {
-            throw new Error('declarative.getSpecifiedAttributes: invalid element (DOM element required)');
+        if (!isDomElement(element)) {
+            throw new Error(errors.verifyDomElement);
         }
     };
 
-}());
+    return getSpecifiedAttributes;
+
+});

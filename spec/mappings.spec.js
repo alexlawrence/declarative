@@ -1,117 +1,18 @@
-describe('declarative.mappings', function() {
+var describe, it, expect, beforeEach;
 
-    var subject = declarative.mappings;
-    var mappingUtilities = internal.mappingUtilities;
+require(['mappings', 'common/errors'], function(mappings, errors) {
+
+    var subject = mappings;
 
     beforeEach(function() {
         subject.clear();
     });
 
-    describe('mappings.add', function() {
+    describe('mappings', function() {
 
-        var originalValidateMapping = mappingUtilities.validateMapping;
-        var originalCompleteMapping = mappingUtilities.completeMapping;
-        var originalOptimizeMapping = mappingUtilities.optimizeMapping;
-        var validateMappingSpy;
-        var completeMappingSpy;
-        var optimizeMappingSpy;
+        describe('adding and requesting a single mapping', function() {
 
-        beforeEach(function() {
-            validateMappingSpy = jasmine.createSpy('internal.mappingUtilities.validateMapping');
-            completeMappingSpy = jasmine.createSpy('internal.mappingUtilities.completeMapping');
-            optimizeMappingSpy = jasmine.createSpy('internal.mappingUtilities.optimizeMapping');
-            mappingUtilities.validateMapping = validateMappingSpy;
-            mappingUtilities.completeMapping = completeMappingSpy;
-            mappingUtilities.optimizeMapping = optimizeMappingSpy;
-        });
-
-        afterEach(function() {
-            mappingUtilities.validateMapping = originalValidateMapping;
-            mappingUtilities.completeMapping = originalCompleteMapping;
-            mappingUtilities.optimizeMapping = originalOptimizeMapping;
-        });
-
-        describe('given a single mapping entry', function() {
-
-            var mapping;
-
-            beforeEach(function() {
-
-                mapping = {
-                    id: 'some id',
-                    types: ['foo', 'bar'],
-                    callback: function() {}
-                };
-                subject.add(mapping);
-
-            });
-
-            it('should call internal.mappingUtilities.validateMapping for the given mapping', function() {
-                expect(validateMappingSpy).toHaveBeenCalledWith(mapping);
-            });
-
-            it('should call internal.mappingUtilities.completeMapping for the given mapping', function() {
-                expect(completeMappingSpy).toHaveBeenCalledWith(mapping);
-            });
-
-            it('should call internal.mappingUtilities.optimizeMapping for the given mapping', function() {
-                expect(optimizeMappingSpy).toHaveBeenCalledWith(mapping);
-            });
-
-        });
-
-        describe('given a list of two mapping entries', function() {
-
-            var mapping1, mapping2;
-
-            beforeEach(function() {
-
-                mapping1 = {
-                    id: 'id 1',
-                    types: ['foo', 'bar'],
-                    callback: function() {}
-                };
-                mapping2 = {
-                    id: 'id 2',
-                    types: ['foo', 'bar'],
-                    callback: function() {}
-                };
-                subject.add([mapping1, mapping2]);
-
-            });
-
-            it('should call internal.mappingUtilities.validateMapping for each given mapping', function() {
-                expect(validateMappingSpy).toHaveBeenCalledWith(mapping1);
-                expect(validateMappingSpy).toHaveBeenCalledWith(mapping2);
-            });
-
-            it('should call internal.mappingUtilities.completeMapping for each given mapping', function() {
-                expect(completeMappingSpy).toHaveBeenCalledWith(mapping1);
-                expect(completeMappingSpy).toHaveBeenCalledWith(mapping2);
-            });
-
-            it('should call internal.mappingUtilities.completeMapping for each given mapping', function() {
-                expect(optimizeMappingSpy).toHaveBeenCalledWith(mapping1);
-                expect(optimizeMappingSpy).toHaveBeenCalledWith(mapping2);
-            });
-
-        });
-
-    });
-
-    describe('mappings.get', function() {
-
-        describe('given a single mapping id', function() {
-
-            it('should throw an error if the id does not exist in the registry', function() {
-
-                expect(function() {
-                    subject.get('some id');
-                }).toThrow('declarative.mappings.get: invalid id "some id"');
-
-            });
-
-            it('should return the mapping with the given id if it exists in the registry', function() {
+            it('should return the mapping with the given id if it was previously added to the registry', function() {
 
                 subject.add({
                     id: 'some id',
@@ -129,26 +30,19 @@ describe('declarative.mappings', function() {
 
             });
 
-        });
-
-        describe('given a list of two mapping ids', function() {
-
-            it('should throw an error if one of the ids does not exist in the registry', function() {
-
-                subject.add({
-                    id: 'some id',
-                    prefix: 'data-',
-                    types: ['calendar'],
-                    callback: function() {}
-                });
+            it('should throw an error if the requested mapping does not exist in the registry', function() {
 
                 expect(function() {
-                    subject.get(['some id', 'some other id']);
-                }).toThrow('declarative.mappings.get: invalid id "some other id"');
+                    subject.get('some id');
+                }).toThrow(errors.getSingleMapping);
 
             });
 
-            it('should return both mappings with the given ids if all exist in the registry', function() {
+        });
+
+        describe('adding and requesting two mappings', function() {
+
+            it('should return both mappings with the given ids if they were previously added to the registry', function() {
 
                 subject.add({
                     id: 'some id',
@@ -168,6 +62,21 @@ describe('declarative.mappings', function() {
 
                 expect(result).toBeDefined();
                 expect(result.length).toBe(2);
+
+            });
+
+            it('should throw an error if one of the requested mappings does not exist in the registry', function() {
+
+                subject.add({
+                    id: 'some id',
+                    prefix: 'data-',
+                    types: ['calendar'],
+                    callback: function() {}
+                });
+
+                expect(function() {
+                    subject.get(['some id', 'some other id']);
+                }).toThrow(errors.getSingleMapping);
 
             });
 

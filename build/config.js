@@ -1,12 +1,14 @@
 exports.name = 'declarative';
 exports.filenames = [
-    '../src/global.js',
-    '../src/internal/array.js','../src/internal/hyphenate.js','../src/internal/isDOMElement.js',
-    '../src/internal/mappingModes.js','../src/internal/mappingUtilities.js',
-    '../src/internal/generateCssSelectors.js','../src/internal/getRelevantElements.js',
-    '../src/internal/getSpecifiedAttributes.js','../src/internal/parseOptions.js',
-    '../src/mappings.js','../src/apply.js'
+    '../src/mmd.js',
+    '../src/common/errors.js','../src/common/mappingModes.js',
+    '../src/common/array.js','../src/common/hyphenate.js','../src/common/parseOptions.js',
+    '../src/dom/isDomElement.js',
+    '../src/dom/generateCssSelectors.js','../src/dom/getRelevantElements.js','../src/dom/getSpecifiedAttributes.js',
+    '../src/processing/validateMapping.js','../src/processing/completeMapping.js','../src/processing/optimizeMapping.js',
+    '../src/mappings.js','../src/applyMappingsTo.js','../src/apply.js','../src/applyAllMappings.js',
+    '../src/export.js'
 ];
-exports.version = '1.1.0';
+exports.version = '1.2.6';
 exports.licensePath = '../LICENSE.txt';
 exports.universalModuleDefinitionPath = './universalModuleDefinition.js';

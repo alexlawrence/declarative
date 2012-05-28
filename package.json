@@ -10,11 +10,15 @@
         {
             "name": "Alex Lawrence",
             "email": "info@alex-lawrence.com"
+        },
+        {
+            "name": "Florian Fanderl",
+            "email": "florian.fanderl@googlemail.com"
         }
     ],
     "name": "declarative",
     "description": "Mapper for custom user interface markup",
-    "version": "1.1.0",
+    "version": "1.2.6",
     "homepage": "http://www.github.com/alexlawrence/declarative",
     "main" : "./bin/declarative.js",
     "repository": {

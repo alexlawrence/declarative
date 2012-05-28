@@ -80,10 +80,10 @@ The above example becomes even more obvious when you imagine the counter being a
 
 ###Features
 
-declarative provides the possibility to declare custom interface elements in the markup and to easily map them to
-arbitrary JavaScript code. It also prevents from writing similar querying and mapping code over and over again.
+declarative provides the possibility to declare custom interface elements in any markup and to easily map them to
+arbitrary JavaScript code. Thus it prevents from writing similar querying and mapping code over and over again.
 
-Let´s assume we want to implement our search interface using declarative. We start off with the following HTML:
+Let´s assume we want to implement the previously mentioned search interface using declarative. We start off with the HTML:
 
 ```html
 <form action="/" method="POST">
@@ -126,21 +126,45 @@ Applying the above mapping to the whole DOM is done by writing the following:
 declarative.apply('counter').to(document);
 ```
 
-**Note:** HTML attributes are not case sensitive.
-declarative automatically transforms hyphenated attribute names to camel case when matching against mapping types.
+####Camel cased types
+
+declarative automatically transforms hyphenated attribute names to camel case when matching against types.
 This is the same behavior as building the dataset attribute from HTML data-* attributes defined
 <a href="http://dev.w3.org/html5/spec/single-page.html#embedding-custom-non-visible-data-with-the-data-attributes">here</a>.
 
+Example:
 
+```html
+<div data-widget-camel-counter="target: 'search', text: '{0} characters left'"></div>
+```
+
+```javascript
+declarative.mappings.add({
+    id: 'camel case',
+    prefix: 'data-widget-',
+    types: ['camelCounter']
+    callback: function(counter, type, options) {
+        // type will be 'camelCounter'
+    }
+});
+```
+
+####Distinct mappings
+
+By default mappings are "distinct". This means that a mapping callback for a certain element is only called once
+no matter how often the mapping is applied. This is especially useful when you encounter DOM changes but don´t want
+to apply a mapping to a specific DOM element.
 
 ###API
 
-Adding mappings:
+####Creating mappings
+
+Basic usage:
 
 ```javascript
 declarative.mappings.add({
     id: 'example mapping', // string identifier
-    prefix: 'data-attribute-prefix-', // lowercase attribute prefix
+    prefix: 'data-attribute-prefix-', // lowercase attribute prefix (optional)
     types: ['types', 'to', 'map'], // types that will be mapped when found
     callback: function(element, type, options) {
         // callback is called for every match in the current mapping when applied
@@ -148,16 +172,42 @@ declarative.mappings.add({
 });
 ```
 
-Applying mappings:
+Advanced usage:
 
 ```javascript
-// mappings can be applied to any DOM element
+declarative.mappings.add({
+    id: 'example mapping',
+    prefix: 'data-attribute-prefix-',
+    types: ['types', 'to', 'map'],
+    callback: function(element, type, options) {},
+    distinct: false, // optional, defaults to true
+    mappingMode: declarative.mappingModes.element // optional, defaults to mappingModes.attribute
+});
+```
+
+####Applying mappings
+
+Mappings can be applied to any DOM element:
+
+```javascript
 declarative.apply('example mapping').to(document);
-// multiple mappings for the same DOM element should be passed in a single call
+```
+
+Multiple mappings for the same DOM element should be passed in a single call:
+
+```javascript
 declarative.apply(['example mapping', 'another mapping']).to(document);
-// all available mappings can be applied at once
+```
+
+All available mappings can be applied at once:
+
+```javascript
 declarative.applyAllMappings().to(document);
-// DOM elements need to be unwrapped when using jquery
+```
+
+DOM elements need to be unwrapped when using jQuery:
+
+```javascript
 declarative.applyAllMappings().to($('#someElement').get(0));
 ```
 
@@ -247,7 +297,6 @@ This is done by changing the mappingMode of a mapping explicitely to "element" (
 ```javascript
 declarative.mappings.add({
     id: 'counter',
-    prefix: '',
     types: ['counter'],
     callback: function(counter, type, options) {
         var input = document.querySelector(options.target);

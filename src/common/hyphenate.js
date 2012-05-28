@@ -1,11 +1,13 @@
-(function(){
+define('common/hyphenate', function(){
 
-    internal.hyphenate = function(input) {
+    var upperCaseRegex = new RegExp(/([A-Z])/g);
+
+    var hyphenate = function(input) {
         return input.replace(upperCaseRegex, function(completeMatch, character) {
             return '-' + character.toLowerCase();
         });
     };
 
-    var upperCaseRegex = new RegExp(/([A-Z])/g);
+    return hyphenate;
 
-}());
+});

@@ -1,6 +1,5 @@
-(function() {
-
-    var array = internal.array = {};
+define('common/array', function() {
+    var array = {};
 
     array.ensureArray = function(value) {
         return array.isArray(value) ? value : [value];
@@ -19,4 +18,6 @@
         return -1;
     };
 
-}());
+    return array;
+});
+
