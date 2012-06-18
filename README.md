@@ -208,16 +208,17 @@ declarative.mappings.add({
 
 ####Asnychronous work
 
-Applying mappings happens asynchronously in order to not block the JavaScript execution thread for too long.
-Therefore the return value of the apply()/applyAllMappings() method is a [promise](http://wiki.commonjs.org/wiki/Promises/A).
-Waiting for mappings to be finished before executing other code is done by writing the following:
+Applying mappings works asynchronously in order to not block the JavaScript execution thread for a too long time.
+The return value of the apply() method is a [promise](http://wiki.commonjs.org/wiki/Promises/A).
+Waiting for mappings to be finished before executing other code can be done by writing the following:
 
 ```javascript
 declarative.applyAllMappings().to(document).then(function() {
     // do something after applying mappings
 });
 ```
-By default the timeout is 1000 ms and the wait time after each timeout is 20ms. These settings can easily be changed:
+By default declarative pauses processing every 1000 ms (timeout) and waits for 20ms (waitTime).
+These settings can easily be changed:
 
 ```javascript
 declarative.settings.mappingTimeoutMs = 200;
