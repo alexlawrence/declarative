@@ -1,8 +1,6 @@
-var describe, it, expect;
+require(['mapping/completeMapping', 'mappingModes'], function(completeMapping, mappingModes) {
 
-require(['processing/completeMapping', 'common/mappingModes'], function(completeMapping, mappingModes) {
-
-    describe('processing/completeMapping', function() {
+    describe('mapping/completeMapping', function() {
 
         var testMethod = completeMapping;
 

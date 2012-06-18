@@ -1,4 +1,4 @@
-define('processing/completeMapping', ['common/mappingModes'], function(mappingModes) {
+define('mapping/completeMapping', ['mappingModes'], function(mappingModes) {
 
     var completeMapping = function(mapping) {
         mapping.prefix = mapping.prefix || '';

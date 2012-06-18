@@ -1,6 +1,4 @@
-var describe, it, expect;
-
-require(['dom/getSpecifiedAttributes', 'common/errors'], function(getSpecifiedAttributes, errors) {
+require(['dom/getSpecifiedAttributes', 'errors'], function(getSpecifiedAttributes, errors) {
 
     describe('dom/getSpecifiedAttributes', function() {
 

@@ -1,8 +1,6 @@
-var describe, it, expect, beforeEach;
+require(['mapping/applyAllMappings', 'mapping/mappings'], function(applyAllMappings, mappings) {
 
-require(['applyAllMappings', 'mappings'], function(applyAllMappings, mappings) {
-
-    describe('applyAllMappings', function() {
+    describe('mapping/applyAllMappings', function() {
 
         var testMethod = applyAllMappings;
         var result;

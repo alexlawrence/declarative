@@ -1,4 +1,4 @@
-define('dom/generateCssSelectors', ['common/mappingModes'], function(mappingModes) {
+define('dom/generateCssSelectors', ['mappingModes'], function(mappingModes) {
 
     var generateCssSelectors = function(typesByMappingMode) {
         var attributeSelectors = generateAttributeSelectors(typesByMappingMode[mappingModes.attribute]);

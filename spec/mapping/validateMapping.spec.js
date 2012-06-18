@@ -1,8 +1,6 @@
-var describe, it, expect;
+require(['mapping/validateMapping', 'errors'], function(validateMapping, errors) {
 
-require(['processing/validateMapping', 'common/errors'], function(validateMapping, errors) {
-
-    describe('processing/validateMapping', function() {
+    describe('mapping/validateMapping', function() {
 
         var testMethod = validateMapping;
 

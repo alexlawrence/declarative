@@ -1,4 +1,4 @@
-define('dom/getSpecifiedAttributes', ['common/errors', 'dom/isDomElement'], function(errors, isDomElement) {
+define('dom/getSpecifiedAttributes', ['errors', 'dom/isDomElement'], function(errors, isDomElement) {
 
     var getSpecifiedAttributes = function(element) {
         verifyDOMElement(element);

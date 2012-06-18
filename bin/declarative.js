@@ -1,6 +1,6 @@
 /**
  * @license
- * declarative - Mapper for custom user interface markup - version 1.2.6
+ * declarative - Mapper for custom user interface markup - version 1.3.7
  *
  * Copyright 2012, Alex Lawrence
  * Licensed under the MIT license.
@@ -18,7 +18,13 @@
 }(this, function () {
 
 function define(a,b,c){define[a]=require(c?b:[],c||b)}function require(a,b){for(var c=[],d;d=a.shift();)c.push(define[d]);return b.apply({},c)}
-define('common/errors', function() {
+define('settings', function() {
+    return {
+        mappingTimeoutMs: 1000,
+        mappingWaitTimeMs: 20
+    };
+});
+define('errors', function() {
 
     var errors = {};
     errors.parseOptions = 'declarative: Error parsing options';
@@ -34,7 +40,7 @@ define('common/errors', function() {
     return errors;
 
 });
-define('common/mappingModes', function() {
+define('mappingModes', function() {
 
     var mappingModes = {
         attribute: 'attribute',
@@ -70,6 +76,100 @@ define('common/array', function() {
 });
 
 
+define('common/async', function() {
+
+    var async = function(callback) {
+
+        var lastStart;
+
+        var setStartAndExecuteCallback = function() {
+            lastStart = new Date().getTime();
+            callback(elapsedTime, scheduleNext);
+        };
+
+        var elapsedTime = function() {
+            return (new Date()).getTime() - lastStart;
+        };
+
+        var scheduleNext = function(timeout) {
+            setTimeout(setStartAndExecuteCallback, timeout);
+        };
+
+        setStartAndExecuteCallback();
+
+    };
+
+    return async;
+
+});
+define('common/Deferred', function() {
+
+    var Deferred = function() {
+
+        if (!(this instanceof Deferred)) { return new Deferred(); }
+
+        var status = null, resolved = 'resolved', rejected = 'rejected';
+        var resolveArguments, rejectArguments;
+        var successHandlers = [], errorHandlers = [];
+
+        this.then = function(successHandler, errorHandler) {
+            var child = new Deferred();
+
+            errorHandler = errorHandler || function() {};
+            successHandler = successHandler || function() {};
+            successHandler = chainSuccessHandler(this, successHandler, child);
+
+            if (status == resolved) {
+                successHandler.apply(this, resolveArguments);
+            }
+            if (status == rejected) {
+                errorHandler.apply(this, rejectArguments);
+            }
+
+            successHandlers.push(successHandler);
+            errorHandlers.push(errorHandler);
+
+            return child;
+        };
+
+        this.resolve = function() {
+            if (!status) {
+                resolveArguments = arguments;
+                executeHandlers(this, successHandlers, resolveArguments);
+                status = resolved;
+            }
+        };
+
+        this.reject = function() {
+            if (!status) {
+                rejectArguments = arguments;
+                executeHandlers(this, errorHandlers, rejectArguments);
+                status = rejected;
+            }
+        };
+
+    };
+
+    var executeHandlers = function(scope, handlers, args) {
+        for (var i = 0, j = handlers.length; i < j; i++) {
+            handlers[i].apply(scope, args);
+        }
+    };
+
+    var chainSuccessHandler = function(scope, handler, deferred) {
+        return function() {
+            try {
+                deferred.resolve(handler.apply(scope, arguments));
+            }
+            catch (error) {
+                deferred.reject(error);
+            }
+        };
+    };
+
+    return Deferred;
+
+});
 define('common/hyphenate', function(){
 
     var upperCaseRegex = new RegExp(/([A-Z])/g);
@@ -98,19 +198,7 @@ define('common/parseOptions', ['common/errors'], function(errors) {
     return parseOptions;
 
 });
-define('dom/isDomElement', function() {
-
-    var isDomElement = function(element) {
-        return element &&
-            (element.nodeType === ELEMENT_NODE || element.nodeType === DOCUMENT_NODE);
-    };
-
-    var ELEMENT_NODE = 1, DOCUMENT_NODE = 9;
-
-    return isDomElement;
-
-});
-define('dom/generateCssSelectors', ['common/mappingModes'], function(mappingModes) {
+define('dom/generateCssSelectors', ['mappingModes'], function(mappingModes) {
 
     var generateCssSelectors = function(typesByMappingMode) {
         var attributeSelectors = generateAttributeSelectors(typesByMappingMode[mappingModes.attribute]);
@@ -138,8 +226,8 @@ define('dom/generateCssSelectors', ['common/mappingModes'], function(mappingMode
 
 });
 define('dom/getRelevantElements',
-    ['common/mappingModes', 'dom/generateCssSelectors'],
-    function(mappingModes, generateCssSelectors) {
+    ['dom/generateCssSelectors', 'mappingModes'],
+    function(generateCssSelectors, mappingModes) {
 
         var getRelevantElements = function(element, mappings) {
             if (element.querySelectorAll) {
@@ -165,7 +253,7 @@ define('dom/getRelevantElements',
 
     }
 );
-define('dom/getSpecifiedAttributes', ['common/errors', 'dom/isDomElement'], function(errors, isDomElement) {
+define('dom/getSpecifiedAttributes', ['errors', 'dom/isDomElement'], function(errors, isDomElement) {
 
     var getSpecifiedAttributes = function(element) {
         verifyDOMElement(element);
@@ -188,7 +276,19 @@ define('dom/getSpecifiedAttributes', ['common/errors', 'dom/isDomElement'], func
     return getSpecifiedAttributes;
 
 });
-define('processing/validateMapping', ['common/errors', 'common/mappingModes'], function(errors, mappingModes) {
+define('dom/isDomElement', function() {
+
+    var isDomElement = function(element) {
+        return element &&
+            (element.nodeType === ELEMENT_NODE || element.nodeType === DOCUMENT_NODE);
+    };
+
+    var ELEMENT_NODE = 1, DOCUMENT_NODE = 9;
+
+    return isDomElement;
+
+});
+define('mapping/validateMapping', ['mappingModes', 'errors'], function(mappingModes, errors) {
 
     var validateMapping = function(mapping) {
         if (!mapping) {
@@ -219,7 +319,7 @@ define('processing/validateMapping', ['common/errors', 'common/mappingModes'], f
     return validateMapping;
 
 });
-define('processing/completeMapping', ['common/mappingModes'], function(mappingModes) {
+define('mapping/completeMapping', ['mappingModes'], function(mappingModes) {
 
     var completeMapping = function(mapping) {
         mapping.prefix = mapping.prefix || '';
@@ -230,7 +330,7 @@ define('processing/completeMapping', ['common/mappingModes'], function(mappingMo
     return completeMapping;
 
 });
-define('processing/optimizeMapping', ['common/hyphenate'], function(hyphenate) {
+define('mapping/optimizeMapping', ['common/hyphenate'], function(hyphenate) {
 
     var optimizeMapping = function(mapping) {
         mapping.prefix = mapping.prefix.toLowerCase();
@@ -244,9 +344,9 @@ define('processing/optimizeMapping', ['common/hyphenate'], function(hyphenate) {
     return optimizeMapping;
 
 });
-define('mappings',
-    ['common/errors', 'common/array', 'processing/validateMapping', 'processing/completeMapping', 'processing/optimizeMapping'],
-    function(errors, array, validateMapping, completeMapping, optimizeMapping) {
+define('mapping/mappings',
+    ['common/array', 'errors', 'mapping/validateMapping', 'mapping/completeMapping', 'mapping/optimizeMapping'],
+    function(array, errors, validateMapping, completeMapping, optimizeMapping) {
 
     var mappings = {};
 
@@ -296,21 +396,32 @@ define('mappings',
 
     var registeredMappings = {};
 
-        return mappings;
+    return mappings;
 
 });
 
 
-define('applyMappingsTo',
-    ['common/array', 'common/errors', 'common/parseOptions', 'common/mappingModes',
-        'dom/isDomElement', 'dom/getRelevantElements', 'dom/getSpecifiedAttributes'],
-    function(array, errors, parseOptions, mappingModes,
-             isDomElement, getRelevantElements, getSpecifiedAttributes) {
+define('mapping/apply',
+    ['mappingModes', 'errors', 'settings',
+        'common/array', 'common/parseOptions', 'common/async', 'common/Deferred',
+        'dom/isDomElement', 'dom/getSpecifiedAttributes', 'dom/getRelevantElements',
+        'mapping/mappings'],
+    function(mappingModes, errors, settings,
+        array, parseOptions, async, Deferred,
+        isDomElement, getSpecifiedAttributes, getRelevantElements, mappings) {
+
+        var apply = function (ids) {
+            var mappingsToApply = mappings.get(ids);
+            mappingsToApply = array.ensureArray(mappingsToApply);
+            return applyMappingsToWrapper(mappingsToApply);
+        };
 
         var applyMappingsToWrapper = function(mappings) {
             return {
-                to: function(element) { applyMappingsTo(mappings, element); }
-            }
+                to: function(element) {
+                    return applyMappingsTo(mappings, element);
+                }
+            };
         };
 
         var applyMappingsTo = function(mappings, rootElement) {
@@ -319,24 +430,36 @@ define('applyMappingsTo',
             var mapping, attributes, elementIndex = allElements.length;
             var element = rootElement != document ? rootElement : allElements[--elementIndex];
             var mappingIndex = 0, j = mappings.length, typeIndex = 0, m = 0;
-            while (element) {
-                attributes = element.attributes;
-                for (mappingIndex = 0; mappingIndex < j; mappingIndex++) {
-                    mapping = mappings[mappingIndex];
-                    for (typeIndex = 0, m = mapping.convertedTypes.length; typeIndex < m; typeIndex++) {
-                        if (elementShouldNotBeMapped(mapping, element, mapping.convertedTypes[typeIndex])) {
-                            continue;
-                        }
-                        if (mapping.mappingMode === mappingModes.attribute) {
-                            applyAttributeMapping(element, mapping, typeIndex);
-                        }
-                        if (mapping.mappingMode === mappingModes.element) {
-                            applyElementMapping(element, mapping, typeIndex);
+            var deferred = new Deferred();
+
+            async(function(elapsedTime, scheduleNext) {
+                while (element) {
+                    attributes = element.attributes;
+                    for (mappingIndex = 0; mappingIndex < j; mappingIndex++) {
+                        mapping = mappings[mappingIndex];
+                        for (typeIndex = 0, m = mapping.convertedTypes.length; typeIndex < m; typeIndex++) {
+                            if (elementShouldNotBeMapped(mapping, element, mapping.convertedTypes[typeIndex])) {
+                                continue;
+                            }
+                            if (mapping.mappingMode === mappingModes.attribute) {
+                                applyAttributeMapping(element, mapping, typeIndex);
+                            }
+                            if (mapping.mappingMode === mappingModes.element) {
+                                applyElementMapping(element, mapping, typeIndex);
+                            }
                         }
                     }
+                    element = elementIndex && allElements[--elementIndex];
+
+                    if (elapsedTime() > settings.mappingTimeoutMs) {
+                        scheduleNext(settings.mappingWaitTimeMs);
+                        return;
+                    }
                 }
-                element = elementIndex && allElements[--elementIndex];
-            }
+                deferred.resolve();
+            });
+
+            return deferred;
         };
 
         var verifyDomElement = function(element) {
@@ -355,7 +478,7 @@ define('applyMappingsTo',
             if (attribute && attribute.specified) {
                 var options = parseOptions(attribute.nodeValue);
                 mapping.callback(element, mapping.types[typeIndex], options);
-                saveAppliedMappingInfo(element, mapping, mapping.types[typeIndex]);
+                saveAppliedMappingInfo(element, mapping, mapping.convertedTypes[typeIndex]);
             }
         };
 
@@ -363,7 +486,7 @@ define('applyMappingsTo',
             if (element.nodeName.toLowerCase() == mapping.convertedTypes[typeIndex]) {
                 var options = getSpecifiedAttributes(element);
                 mapping.callback(element, mapping.types[typeIndex], options);
-                saveAppliedMappingInfo(element, mapping, mapping.types[typeIndex]);
+                saveAppliedMappingInfo(element, mapping, mapping.convertedTypes[typeIndex]);
             }
         };
 
@@ -381,45 +504,37 @@ define('applyMappingsTo',
 
         var appliedMappings = {}, idAttributeName = 'data-declarative-id', currentId = 1;
 
-        return applyMappingsToWrapper;
-
+        return apply;
     }
 );
-define('apply',
-    ['common/array', 'mappings', 'applyMappingsTo'],
-    function(array, mappings, applyMappingsToWrapper) {
-
-        return function (ids) {
-            var mappingsToApply = mappings.get(ids);
-            mappingsToApply = array.ensureArray(mappingsToApply);
-            return applyMappingsToWrapper(mappingsToApply);
-        };
-
-    }
-);
-define('applyAllMappings',
-    ['mappings', 'applyMappingsTo'],
-    function( mappings, applyMappingsTo) {
+define('mapping/applyAllMappings',
+    ['mapping/mappings', 'mapping/apply'],
+    function(mappings, apply) {
 
         return function () {
-            return applyMappingsTo(mappings.getAll());
+            var ids = [], allMappings = mappings.getAll();
+            for (var i = 0, j = allMappings.length; i < j; i++) {
+                ids.push(allMappings[i].id);
+            }
+            return apply(ids);
         };
 
     }
 );
 var declarative = {};
 require(
-    ['common/mappingModes', 'mappings', 'apply', 'applyAllMappings'],
-    function(mappingModes, mappings, apply, applyAllMappings) {
+    ['mappingModes', 'mapping/mappings', 'mapping/apply', 'mapping/applyAllMappings', 'settings'],
+    function(mappingModes, mappings, apply, applyAllMappings, settings) {
         declarative.mappingModes = mappingModes;
         declarative.mappings = mappings;
         declarative.apply = apply;
         declarative.applyAllMappings = applyAllMappings;
+        declarative.settings = settings;
     }
 );
 
 
-declarative.version = '1.2.6';
+declarative.version = '1.3.7';
 
 return declarative;
 

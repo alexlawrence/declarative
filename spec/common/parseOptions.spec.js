@@ -1,5 +1,3 @@
-var describe, it, expect;
-
 require(['common/parseOptions'], function(parseOptions) {
 
     describe('common/parseOptions', function() {

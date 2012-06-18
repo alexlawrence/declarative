@@ -1,6 +1,6 @@
-define('mappings',
-    ['common/errors', 'common/array', 'processing/validateMapping', 'processing/completeMapping', 'processing/optimizeMapping'],
-    function(errors, array, validateMapping, completeMapping, optimizeMapping) {
+define('mapping/mappings',
+    ['common/array', 'errors', 'mapping/validateMapping', 'mapping/completeMapping', 'mapping/optimizeMapping'],
+    function(array, errors, validateMapping, completeMapping, optimizeMapping) {
 
     var mappings = {};
 
@@ -50,7 +50,7 @@ define('mappings',
 
     var registeredMappings = {};
 
-        return mappings;
+    return mappings;
 
 });
 

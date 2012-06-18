@@ -1,4 +1,4 @@
-define('common/mappingModes', function() {
+define('mappingModes', function() {
 
     var mappingModes = {
         attribute: 'attribute',

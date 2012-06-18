@@ -1,5 +1,3 @@
-var describe, it, expect;
-
 require(['dom/isDomElement'], function(isDomElement) {
 
     describe('dom/isDomElement', function() {

@@ -1,5 +1,3 @@
-var describe, it, expect;
-
 require(['common/array'], function(array) {
 
     describe('common/array', function() {

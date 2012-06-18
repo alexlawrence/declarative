@@ -1,4 +1,4 @@
-define('processing/validateMapping', ['common/errors', 'common/mappingModes'], function(errors, mappingModes) {
+define('mapping/validateMapping', ['mappingModes', 'errors'], function(mappingModes, errors) {
 
     var validateMapping = function(mapping) {
         if (!mapping) {

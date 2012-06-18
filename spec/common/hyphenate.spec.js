@@ -1,5 +1,3 @@
-var describe, it, expect;
-
 require(['common/hyphenate'], function(hyphenate) {
 
     describe('common/hyphenate', function() {

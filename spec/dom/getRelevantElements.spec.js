@@ -1,5 +1,3 @@
-var describe, it, expect;
-
 require(['dom/getRelevantElements'], function(getRelevantElements) {
 
     var testMethod = getRelevantElements;

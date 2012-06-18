@@ -1,6 +1,6 @@
 define('dom/getRelevantElements',
-    ['common/mappingModes', 'dom/generateCssSelectors'],
-    function(mappingModes, generateCssSelectors) {
+    ['dom/generateCssSelectors', 'mappingModes'],
+    function(generateCssSelectors, mappingModes) {
 
         var getRelevantElements = function(element, mappings) {
             if (element.querySelectorAll) {

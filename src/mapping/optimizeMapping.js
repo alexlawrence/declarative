@@ -1,4 +1,4 @@
-define('processing/optimizeMapping', ['common/hyphenate'], function(hyphenate) {
+define('mapping/optimizeMapping', ['common/hyphenate'], function(hyphenate) {
 
     var optimizeMapping = function(mapping) {
         mapping.prefix = mapping.prefix.toLowerCase();

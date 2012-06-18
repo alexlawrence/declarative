@@ -2,7 +2,7 @@ describe('performance', function() {
 
     var countOfMappings = 5, countOfMatchingElements = 100, countOfNonMatchingElements = 1500;
 
-    describe('applying ' + countOfMappings + ' mappings with 5 types to ' +
+    describe('applying ' + countOfMappings + ' non distinct mappings with 5 types to ' +
         countOfMatchingElements + ' elements with each 5 matching attributes and ' +
         countOfNonMatchingElements + ' elements with each 5 non matching attributes ', function() {
 
@@ -47,7 +47,9 @@ describe('performance', function() {
                     id: 'test' + i,
                     prefix: 'data-',
                     types: ['one', 'two', 'three', 'four', 'five'],
-                    callback: logCallback});
+                    callback: logCallback,
+                    distinct: false
+                });
             }
 
             var mappingIds = [];
@@ -59,13 +61,13 @@ describe('performance', function() {
 
             var startTime = new Date();
 
-            declarative.apply(mappingIds).to(root);
+            waitsForDeferred(declarative.apply(mappingIds).to(root));
 
-            var elapsedTime = new Date() - startTime;
-
-		    alert('performance test took: ' + elapsedTime + ' ms');
-			
-            expect(calls).toBe(countOfMatchingElements * countOfMappings * 5);
+            runs(function() {
+                var elapsedTime = new Date() - startTime;
+                alert('performance test took: ' + elapsedTime + ' ms');
+                expect(calls).toBe(countOfMatchingElements * countOfMappings * 5);
+            });
 
         });
 

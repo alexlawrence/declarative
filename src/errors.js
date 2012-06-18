@@ -1,4 +1,4 @@
-define('common/errors', function() {
+define('errors', function() {
 
     var errors = {};
     errors.parseOptions = 'declarative: Error parsing options';

@@ -1,6 +1,4 @@
-var describe, it, expect, beforeEach;
-
-require(['mappings', 'common/errors'], function(mappings, errors) {
+require(['mapping/mappings', 'errors'], function(mappings, errors) {
 
     var subject = mappings;
 
@@ -8,7 +6,7 @@ require(['mappings', 'common/errors'], function(mappings, errors) {
         subject.clear();
     });
 
-    describe('mappings', function() {
+    describe('mapping/mappings', function() {
 
         describe('adding and requesting a single mapping', function() {
 

@@ -1,8 +1,6 @@
-var describe, it, expect;
+require(['mapping/optimizeMapping'], function(optimizeMapping) {
 
-require(['processing/optimizeMapping'], function(optimizeMapping) {
-
-    describe('processing/optimizeMapping', function() {
+    describe('mapping/optimizeMapping', function() {
 
         var testMethod = optimizeMapping;
 

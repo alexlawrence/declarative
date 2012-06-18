@@ -1,7 +1,5 @@
-var describe, it, expect;
-
 require(
-    ['dom/generateCssSelectors', 'common/mappingModes'],
+    ['dom/generateCssSelectors', 'mappingModes'],
     function(generateCssSelectors, mappingModes) {
 
         describe('dom/generateCssSelectors', function() {

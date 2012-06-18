@@ -126,6 +126,47 @@ Applying the above mapping to the whole DOM is done by writing the following:
 declarative.apply('counter').to(document);
 ```
 
+###API
+
+####Creating mappings
+
+```javascript
+declarative.mappings.add({
+    id: 'example mapping', // string identifier
+    prefix: 'data-attribute-prefix-', // lowercase attribute prefix (optional)
+    types: ['types', 'to', 'map'], // types that will be mapped when found
+    callback: function(element, type, options) {
+        // callback is called for every match in the current mapping when applied
+    }
+});
+```
+
+####Applying mappings
+
+Mappings can be applied to any DOM element:
+
+```javascript
+declarative.apply('example mapping').to(document);
+```
+
+Multiple mappings for the same DOM element should be passed in a single call:
+
+```javascript
+declarative.apply(['example mapping', 'another mapping']).to(document);
+```
+
+All available mappings can be applied at once:
+
+```javascript
+declarative.applyAllMappings().to(document);
+```
+
+DOM elements need to be unwrapped when using jQuery:
+
+```javascript
+declarative.applyAllMappings().to($('#someElement').get(0));
+```
+
 ####Camel cased types
 
 declarative automatically transforms hyphenated attribute names to camel case when matching against types.
@@ -155,60 +196,32 @@ By default mappings are "distinct". This means that a mapping callback for a cer
 no matter how often the mapping is applied. This is especially useful when you encounter DOM changes but don´t want
 to apply a mapping to a specific DOM element.
 
-###API
-
-####Creating mappings
-
-Basic usage:
-
-```javascript
-declarative.mappings.add({
-    id: 'example mapping', // string identifier
-    prefix: 'data-attribute-prefix-', // lowercase attribute prefix (optional)
-    types: ['types', 'to', 'map'], // types that will be mapped when found
-    callback: function(element, type, options) {
-        // callback is called for every match in the current mapping when applied
-    }
-});
-```
-
-Advanced usage:
-
 ```javascript
 declarative.mappings.add({
     id: 'example mapping',
     prefix: 'data-attribute-prefix-',
     types: ['types', 'to', 'map'],
     callback: function(element, type, options) {},
-    distinct: false, // optional, defaults to true
-    mappingMode: declarative.mappingModes.element // optional, defaults to mappingModes.attribute
+    distinct: false
 });
 ```
 
-####Applying mappings
+####Asnychronous work
 
-Mappings can be applied to any DOM element:
+Applying mappings happens asynchronously in order to not block the JavaScript execution thread for too long.
+Therefore the return value of the apply()/applyAllMappings() method is a [promise](http://wiki.commonjs.org/wiki/Promises/A).
+Waiting for mappings to be finished before executing other code is done by writing the following:
 
 ```javascript
-declarative.apply('example mapping').to(document);
+declarative.applyAllMappings().to(document).then(function() {
+    // do something after applying mappings
+});
 ```
-
-Multiple mappings for the same DOM element should be passed in a single call:
-
-```javascript
-declarative.apply(['example mapping', 'another mapping']).to(document);
-```
-
-All available mappings can be applied at once:
+By default the timeout is 1000 ms and the wait time after each timeout is 20ms. These settings can easily be changed:
 
 ```javascript
-declarative.applyAllMappings().to(document);
-```
-
-DOM elements need to be unwrapped when using jQuery:
-
-```javascript
-declarative.applyAllMappings().to($('#someElement').get(0));
+declarative.settings.mappingTimeoutMs = 200;
+declarative.settings.mappingWaitTimeMs = 10;
 ```
 
 ###Examples
@@ -274,13 +287,6 @@ declarative.apply('jQuery.validate.form').to(document);
 declarative.apply('jQuery.validate.input').to(document);
 ```
 
-###Performance
-
-declarative is optimized for performance.
-It uses query selectors where available and parses the minimum set of HTML elements and attributes.
-However in Internet Explorer 7 or below it could lead to performance issues
-when applying mappings to pages which contain more than 1500 DOM elements.
-
 ###Roll your own markup language
 
 declarative can also map elements giving the possibility to use a custom markup language.
@@ -302,7 +308,7 @@ declarative.mappings.add({
         var input = document.querySelector(options.target);
         countCharacters(input, counter, options.text);
     },
-    mappingMode: 'element'
+    mappingMode: declarative.mappingModes.element
 });
 ```
 
