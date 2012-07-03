@@ -284,8 +284,10 @@ declarative.mappings.add({
     }
 });
 
-declarative.apply('jQuery.validate.form').to(document);
-declarative.apply('jQuery.validate.input').to(document);
+declarative.apply('jQuery.validate.form').to(document).then(function() {
+    declarative.apply('jQuery.validate.input').to(document);
+});
+
 ```
 
 ###Roll your own markup language
