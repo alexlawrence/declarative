@@ -29,5 +29,9 @@
         "node": ">=0.6.7"
     },
     "license": "MIT",
-    "dependencies": {}
+    "dependencies": {},
+    "devDependencies": {
+        "grunt": "~0.3.12",
+        "grunt-jasmine-task": "~0.2.2"
+    }
 }

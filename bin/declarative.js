@@ -13,7 +13,7 @@
     } else if (typeof define === 'function' && define.amd) {
         define(factory);
     } else {
-        root.declarative = factory();
+        declarative = factory();
     }
 }(this, function () {
 
@@ -532,7 +532,6 @@ require(
         declarative.settings = settings;
     }
 );
-
 
 declarative.version = '1.3.7';
 
