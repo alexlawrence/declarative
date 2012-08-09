@@ -13,7 +13,7 @@
     } else if (typeof define === 'function' && define.amd) {
         define(factory);
     } else {
-        declarative = factory();
+        root.declarative = factory();
     }
 }(this, function () {
 
