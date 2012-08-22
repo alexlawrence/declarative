@@ -1,4 +1,4 @@
-define('common/parseOptions', ['common/errors'], function(errors) {
+define('common/parseOptions', ['errors'], function(errors) {
 
     var parseOptions = function(input) {
         try {

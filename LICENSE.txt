@@ -1,9 +1,7 @@
 /**
  * @license
- * declarative - Mapper for custom user interface markup - version ${version}
- *
+ * declarative - Mapper for custom user interface markup - version 1.3.7
  * Copyright 2012, Alex Lawrence
  * Licensed under the MIT license.
  * http://www.opensource.org/licenses/MIT
- *
- */ 
+ */

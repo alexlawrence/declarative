@@ -1,23 +1,26 @@
 /**
  * @license
  * declarative - Mapper for custom user interface markup - version 1.3.7
- *
  * Copyright 2012, Alex Lawrence
  * Licensed under the MIT license.
  * http://www.opensource.org/licenses/MIT
- *
- */ 
-(function (root, factory) {
-    if (typeof exports === 'object') {
-        module.exports = factory();
-    } else if (typeof define === 'function' && define.amd) {
-        define(factory);
-    } else {
-        root.declarative = factory();
-    }
-}(this, function () {
+ */
 
-function define(a,b,c){define[a]=require(c?b:[],c||b)}function require(a,b,c,i){c=[];for(i in a)c[i]=define[a[i]];return b.apply(0,c)}
+(function (root, factory) {
+
+        if (typeof exports === 'object') {
+            module.exports = factory();
+        }
+        else if (typeof define === 'function' && define.amd) {
+            define(factory);
+        }
+        else {
+            root.declarative = factory();
+        }
+
+    }(this, function () {
+
+        function define(a,b,c){define[a]=require(c?b:[],c||b)}function require(a,b,c,i){c=[];for(i in a)c[i]=define[a[i]];return b.apply(0,c)}
 define('settings', function() {
     return {
         mappingTimeoutMs: 1000,
@@ -183,7 +186,7 @@ define('common/hyphenate', function(){
     return hyphenate;
 
 });
-define('common/parseOptions', ['common/errors'], function(errors) {
+define('common/parseOptions', ['errors'], function(errors) {
 
     var parseOptions = function(input) {
         try {
@@ -532,9 +535,8 @@ require(
         declarative.settings = settings;
     }
 );
+declarative.version = "1.3.7";
 
-declarative.version = '1.3.7';
+        return declarative;
 
-return declarative;
-
-}));
+    }));

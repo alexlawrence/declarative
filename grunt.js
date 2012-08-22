@@ -1,18 +1,43 @@
 module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-jasmine-task');
+    grunt.loadNpmTasks('grunt-umd');
+    grunt.loadNpmTasks('grunt-reznik');
+
+    var license =
+        '/**\n' +
+        ' * @license\n' +
+        ' * declarative - Mapper for custom user interface markup - version <%= pkg.version %>\n' +
+        ' * Copyright 2012, Alex Lawrence\n' +
+        ' * Licensed under the MIT license.\n' +
+        ' * http://www.opensource.org/licenses/MIT\n' +
+        ' */';
+
+    var version = 'declarative.version = "<%= pkg.version %>";';
 
     grunt.initConfig({
+        pkg: '<json:package.json>',
+        meta: {
+            license: license,
+            version: version
+        },
         jasmine: {
           all: {
             src: ['spec/runner.html'],
             errorReporting: true
-          }
+          },
+		  as24: {
+			src: ['E:/Sources/trunk/Resources.Web/JavaScripts/as24/**/*.runner.html'],
+            errorReporting: true
+		  }
         },
         concat: {
+            license: {
+                src: ['<banner:meta.license>'],
+                dest: 'LICENSE.txt'
+            },
             code: {
                 src: [
-                    'src/umd/start.js',
                     'src/mmd.js','src/settings.js','src/errors.js','src/mappingModes.js',
                     'src/common/array.js','src/common/async.js','src/common/Deferred.js',
                     'src/common/hyphenate.js','src/common/parseOptions.js',
@@ -20,48 +45,31 @@ module.exports = function(grunt) {
                     'src/mapping/validateMapping.js','src/mapping/completeMapping.js','src/mapping/optimizeMapping.js',
                     'src/mapping/mappings.js','src/mapping/apply.js','src/mapping/applyAllMappings.js',
                     'src/export.js',
-                    'src/umd/end.js'
+                    '<banner:meta.version>'
                 ],
                 dest: 'bin/declarative.js'
             },
-            license: {
-                src: ['LICENSE.txt', 'bin/declarative.js'],
+            codeAndLicense: {
+                src: ['<banner:meta.license>', 'bin/declarative.js'],
                 dest: 'bin/declarative.js'
-            },
-            licenseMinified: {
-                src: ['LICENSE.txt', 'bin/declarative.min.js'],
-                dest: 'bin/declarative.min.js'
+            }
+        },
+        umd: {
+            all: {
+                src: 'bin/declarative.js',
+                dest: 'bin/declarative.js',
+                objectToExport: 'declarative'
             }
         },
         min: {
             all: {
-                src: ['bin/declarative.js'],
+                src: ['<banner:meta.license>', 'bin/declarative.js'],
                 dest: 'bin/declarative.min.js'
             }
         }
     });
-
-    grunt.registerTask('umd', 'Surrounds the code with the universal module definition', function() {
-        var umd = grunt.file.read('src/umd.js');
-        var code = grunt.file.read('bin/declarative.js');
-        code = umd.replace(/\$\{code\}/, code);
-        grunt.file.write('bin/declarative.js', code);
-    });
     
-    grunt.registerTask('version', 'Adds the version number from package.json to the code', function() {
-        addLicense('bin/declarative.js');
-        addLicense('bin/declarative.min.js');
-    });
-    
-    var addLicense = (function() {
-        var packageInfo = grunt.file.readJSON('package.json');
-        return function(filename) {
-            var code = grunt.file.read(filename);
-            code = code.replace(/\$\{version\}/g, packageInfo.version);
-            grunt.file.write(filename, code);
-        };
-    }());
-    
-    grunt.registerTask('default', 'jasmine concat:code umd min concat:license concat:licenseMinified version');
+    grunt.registerTask('default', 'jasmine concat:code umd concat:codeAndLicense min');
+    grunt.registerTask('licenseText', 'concat:license')
 
 };
