@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/alexlawrence/declarative.png)](http://travis-ci.org/alexlawrence/declarative)
 #declarative
 
 Mapper for custom user interface markup.
