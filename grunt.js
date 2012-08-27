@@ -25,11 +25,7 @@ module.exports = function(grunt) {
           all: {
             src: ['spec/runner.html'],
             errorReporting: true
-          },
-		  as24: {
-			src: ['E:/Sources/trunk/Resources.Web/JavaScripts/as24/**/*.runner.html'],
-            errorReporting: true
-		  }
+          }
         },
         concat: {
             license: {
