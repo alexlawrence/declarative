@@ -62,10 +62,17 @@ module.exports = function(grunt) {
                 src: ['<banner:meta.license>', 'bin/declarative.js'],
                 dest: 'bin/declarative.min.js'
             }
+        },
+        reznik: {
+            all: {
+                basePath: 'src',
+                analysis: 'all',
+                exclude: 'mmd'
+            }
         }
     });
     
-    grunt.registerTask('default', 'jasmine concat:code umd concat:codeAndLicense min');
+    grunt.registerTask('default', 'jasmine reznik concat:code umd concat:codeAndLicense min');
     grunt.registerTask('licenseText', 'concat:license')
 
 };
