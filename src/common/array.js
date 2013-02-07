@@ -1,23 +1,21 @@
-define('common/array', function() {
-    var array = {};
+var array = {};
 
-    array.ensureArray = function(value) {
-        return array.isArray(value) ? value : [value];
-    };
+array.ensureArray = function(value) {
+    return array.isArray(value) ? value : [value];
+};
 
-    array.isArray = function(value) {
-        return Object.prototype.toString.call(value) === '[object Array]';
-    };
+array.isArray = function(value) {
+    return Object.prototype.toString.call(value) === '[object Array]';
+};
 
-    array.indexOf = function(haystack, needle) {
-        for (var i = 0, j = haystack.length; i < j; i++) {
-            if (haystack[i] == needle) {
-                return i;
-            }
+array.indexOf = function(haystack, needle) {
+    for (var i = 0, j = haystack.length; i < j; i++) {
+        if (haystack[i] == needle) {
+            return i;
         }
-        return -1;
-    };
+    }
+    return -1;
+};
 
-    return array;
-});
+module.exports = array;
 

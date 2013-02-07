@@ -2,7 +2,8 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-jasmine-task');
     grunt.loadNpmTasks('grunt-umd');
-    grunt.loadNpmTasks('grunt-reznik');
+    grunt.loadNpmTasks('grunt-cjs2web');
+    grunt.loadNpmTasks('grunt-closure-compiler');
 
     var license =
         '/**\n' +
@@ -22,28 +23,28 @@ module.exports = function(grunt) {
             version: version
         },
         jasmine: {
-          all: {
-            src: ['spec/runner.html'],
-            errorReporting: true
-          }
+            all: {
+                src: ['spec/runner.html'],
+                errorReporting: true
+            }
+        },
+        cjs2web: {
+            specs: {
+                fileName: './spec/index.spec.js',
+                combine: true,
+                output: './spec/declarative.specs.generated.js'
+            },
+            code: {
+                fileName: './src/index.js',
+                basePath: './src',
+                combine: true,
+                output: './bin/declarative.js'
+            }
         },
         concat: {
             license: {
                 src: ['<banner:meta.license>'],
                 dest: 'LICENSE.txt'
-            },
-            code: {
-                src: [
-                    'src/mmd.js','src/settings.js','src/errors.js','src/mappingModes.js',
-                    'src/common/array.js','src/common/async.js','src/common/Deferred.js',
-                    'src/common/hyphenate.js','src/common/parseOptions.js',
-                    'src/dom/generateCssSelectors.js','src/dom/getRelevantElements.js','src/dom/getSpecifiedAttributes.js','src/dom/isDomElement.js',
-                    'src/mapping/validateMapping.js','src/mapping/completeMapping.js','src/mapping/optimizeMapping.js',
-                    'src/mapping/mappings.js','src/mapping/apply.js','src/mapping/applyAllMappings.js',
-                    'src/export.js',
-                    '<banner:meta.version>'
-                ],
-                dest: 'bin/declarative.js'
             },
             codeAndLicense: {
                 src: ['<banner:meta.license>', 'bin/declarative.js'],
@@ -54,25 +55,23 @@ module.exports = function(grunt) {
             all: {
                 src: 'bin/declarative.js',
                 dest: 'bin/declarative.js',
-                objectToExport: 'declarative'
+                objectToExport: '__index',
+                globalAlias: 'declarative'
             }
         },
-        min: {
+        'closure-compiler': {
             all: {
-                src: ['<banner:meta.license>', 'bin/declarative.js'],
-                dest: 'bin/declarative.min.js'
-            }
-        },
-        reznik: {
-            all: {
-                basePath: 'src',
-                analysis: 'all',
-                exclude: 'mmd'
+                closurePath: 'D:/ClosureCompiler',
+                js: 'bin/declarative.js',
+                jsOutputFile: 'bin/declarative.min.js',
+                options: {
+                    compilation_level: 'SIMPLE_OPTIMIZATIONS'
+                }
             }
         }
     });
-    
-    grunt.registerTask('default', 'jasmine reznik concat:code umd concat:codeAndLicense min');
-    grunt.registerTask('licenseText', 'concat:license')
+
+    grunt.registerTask('default',
+        'cjs2web:specs jasmine cjs2web:code umd concat:codeAndLicense closure-compiler concat:license');
 
 };

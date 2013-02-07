@@ -1,11 +1,3 @@
-define('mappingModes', function() {
-
-    var mappingModes = {
-        attribute: 'attribute',
-        element: 'element'
-    };
-
-    return mappingModes;
-
-});
+exports.attribute = 'attribute';
+exports.element = 'element';
 

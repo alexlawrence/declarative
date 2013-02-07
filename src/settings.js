@@ -1,6 +1,2 @@
-define('settings', function() {
-    return {
-        mappingTimeoutMs: 1000,
-        mappingWaitTimeMs: 20
-    };
-});
+exports.mappingTimeoutMs = 1000;
+exports.mappingWaitTimeMs = 20;

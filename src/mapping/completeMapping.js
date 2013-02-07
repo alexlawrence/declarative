@@ -1,11 +1,9 @@
-define('mapping/completeMapping', ['mappingModes'], function(mappingModes) {
+var mappingModes = require('../mappingModes');
 
-    var completeMapping = function(mapping) {
-        mapping.prefix = mapping.prefix || '';
-        mapping.mappingMode = mapping.mappingMode || mappingModes.attribute;
-        mapping.distinct = (mapping.distinct !== undefined) ? mapping.distinct : true;
-    };
+var completeMapping = function(mapping) {
+    mapping.prefix = mapping.prefix || '';
+    mapping.mappingMode = mapping.mappingMode || mappingModes.attribute;
+    mapping.distinct = (mapping.distinct !== undefined) ? mapping.distinct : true;
+};
 
-    return completeMapping;
-
-});
+module.exports = completeMapping;

@@ -1,60 +1,56 @@
-require(['dom/isDomElement'], function(isDomElement) {
+describe('dom/isDomElement', function() {
 
-    describe('dom/isDomElement', function() {
+    var testMethod = require('../../src/dom/isDomElement');
 
-        var testMethod = isDomElement;
+    it('should return false if given no element', function() {
 
-        it('should return false if given no element', function() {
+        var result = testMethod();
 
-            var result = testMethod();
+        expect(result).toBeFalsy();
 
-            expect(result).toBeFalsy();
+    });
 
-        });
+    it('should return false if given an empty object', function() {
 
-        it('should return false if given an empty object', function() {
+        var result = testMethod({});
 
-            var result = testMethod({});
+        expect(result).toBeFalsy();
 
-            expect(result).toBeFalsy();
+    });
 
-        });
+    it('should return false if given a jquery selector result', function() {
 
-        it('should return false if given a jquery selector result', function() {
+        var result = testMethod($('<div></div>'));
 
-            var result = testMethod($('<div></div>'));
+        expect(result).toBeFalsy();
 
-            expect(result).toBeFalsy();
+    });
 
-        });
+    it('should return false if given a DOM attribute', function() {
 
-        it('should return false if given a DOM attribute', function() {
+        var attribute = document.createAttribute('something');
 
-            var attribute = document.createAttribute('something');
+        var result = testMethod(attribute);
 
-            var result = testMethod(attribute);
+        expect(result).toBeFalsy();
 
-            expect(result).toBeFalsy();
+    });
 
-        });
+    it('should return true if given a DOM element', function() {
 
-        it('should return true if given a DOM element', function() {
+        var element = document.createElement('something');
 
-            var element = document.createElement('something');
+        var result = testMethod(element);
 
-            var result = testMethod(element);
+        expect(result).toBeTruthy();
 
-            expect(result).toBeTruthy();
+    });
 
-        });
+    it('should return true if given the document element', function() {
 
-        it('should return true if given the document element', function() {
+        var result = testMethod(document);
 
-            var result = testMethod(document);
-
-            expect(result).toBeTruthy();
-
-        });
+        expect(result).toBeTruthy();
 
     });
 

@@ -1,0 +1,15 @@
+require('./common/array.spec');
+require('./common/async.spec');
+require('./common/Deferred.spec');
+require('./common/hyphenate.spec');
+require('./common/parseOptions.spec');
+require('./dom/generateCssSelectors.spec');
+require('./dom/getRelevantElements.spec');
+require('./dom/getSpecifiedAttributes.spec');
+require('./dom/isDOMElement.spec');
+require('./mapping/apply.spec');
+require('./mapping/applyAllMappings.spec');
+require('./mapping/completeMapping.spec');
+require('./mapping/mappings.spec');
+require('./mapping/optimizeMapping.spec');
+require('./mapping/validateMapping.spec');

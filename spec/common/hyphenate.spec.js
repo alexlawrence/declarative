@@ -1,38 +1,34 @@
-require(['common/hyphenate'], function(hyphenate) {
+describe('common/hyphenate', function() {
 
-    describe('common/hyphenate', function() {
+    var testMethod = require('../../src/common/hyphenate');
 
-        var testMethod = hyphenate;
+    it('should return lowercase strings unmodified', function() {
 
-        it('should return lowercase strings unmodified', function() {
+        var input = 'lowercase';
 
-            var input = 'lowercase';
+        var result = testMethod(input);
 
-            var result = testMethod(input);
+        expect(result).toBe(input);
 
-            expect(result).toBe(input);
+    });
 
-        });
+    it('should replace uppercase characters with a lowercase counterpart preceeded by a hyphen', function() {
 
-        it('should replace uppercase characters with a lowercase counterpart preceeded by a hyphen', function() {
+        var input = 'upperCaseText';
 
-            var input = 'upperCaseText';
+        var result = testMethod(input);
 
-            var result = testMethod(input);
+        expect(result).toBe('upper-case-text');
 
-            expect(result).toBe('upper-case-text');
+    });
 
-        });
+    it('should replace an uppercase character even if it is the first one in the given string', function() {
 
-        it('should replace an uppercase character even if it is the first one in the given string', function() {
+        var input = 'Test';
 
-            var input = 'Test';
+        var result = testMethod(input);
 
-            var result = testMethod(input);
-
-            expect(result).toBe('-test');
-
-        });
+        expect(result).toBe('-test');
 
     });
 

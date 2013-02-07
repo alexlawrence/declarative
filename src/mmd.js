@@ -1,1 +1,0 @@
-function define(a,b,c){define[a]=require(c?b:[],c||b)}function require(a,b,c,i){c=[];for(i in a)c[i]=define[a[i]];return b.apply(0,c)}
