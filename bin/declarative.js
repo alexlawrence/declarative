@@ -262,8 +262,7 @@
 
         var parseOptions = function (input) {
             try {
-                var output;
-                return eval('output = {' + input + '}');
+                return (new Function('return {'+input+'}'))();
             }
             catch (error) {
                 throw new Error(errors.parseOptions);
