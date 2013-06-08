@@ -210,6 +210,7 @@
                 optimizeMapping(mapping);
                 registeredMappings[mapping.id] = mapping;
             }
+            return mappings;
         };
 
         mappings.getAll = function () {
