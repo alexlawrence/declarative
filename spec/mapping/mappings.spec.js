@@ -7,6 +7,20 @@ describe('mapping/mappings', function() {
         subject.clear();
     });
 
+    describe('when adding a mapping', function() {
+
+        var _result;
+
+        beforeEach(function() {
+            _result = subject.add({id: 'id', types: ['calendar'], callback: function() {}});
+        });
+
+        it('should return the mappings module in order to enable chaining', function() {
+            expect(_result).toBe(subject);
+        });
+
+    });
+
     describe('adding and requesting a single mapping', function() {
 
         it('should return the mapping with the given id if it was previously added to the registry', function() {

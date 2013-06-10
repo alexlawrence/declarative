@@ -24,7 +24,7 @@ module.exports = function(grunt) {
         },
         jasmine: {
             all: {
-                src: ['spec/runner.html'],
+                src: ['./spec/runner.html'],
                 errorReporting: true
             }
         },
@@ -61,17 +61,18 @@ module.exports = function(grunt) {
         },
         'closure-compiler': {
             all: {
-                closurePath: 'D:/ClosureCompiler',
+                closurePath: '/usr/local/opt/closure-compiler/libexec',
                 js: 'bin/declarative.js',
                 jsOutputFile: 'bin/declarative.min.js',
                 options: {
                     compilation_level: 'SIMPLE_OPTIMIZATIONS'
-                }
+                },
+                noreport: true
             }
         }
     });
 
-    grunt.registerTask('default',
-        'cjs2web:specs jasmine cjs2web:code umd concat:codeAndLicense closure-compiler concat:license');
+    grunt.registerTask('default', ['cjs2web:specs', 'jasmine', 'cjs2web:code', 'umd',
+        'concat:codeAndLicense', 'closure-compiler', 'concat:license']);
 
 };

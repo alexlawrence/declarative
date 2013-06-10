@@ -360,6 +360,7 @@ mappings.add = function(newMappings) {
         optimizeMapping(mapping);
         registeredMappings[mapping.id] = mapping;
     }
+    return mappings;
 };
 
 mappings.getAll = function() {
@@ -1822,6 +1823,20 @@ describe('mapping/mappings', function() {
 
     beforeEach(function() {
         subject.clear();
+    });
+
+    describe('when adding a mapping', function() {
+
+        var _result;
+
+        beforeEach(function() {
+            _result = subject.add({id: 'id', types: ['calendar'], callback: function() {}});
+        });
+
+        it('should return the mappings module in order to enable chaining', function() {
+            expect(_result).toBe(subject);
+        });
+
     });
 
     describe('adding and requesting a single mapping', function() {
