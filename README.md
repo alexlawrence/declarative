@@ -2,6 +2,8 @@
 
 Mapper for custom user interface markup.
 
+**Note:** This library follows a similar concept like AngularJS directives or HTML5 Web Components. Personally I would probably go for a Web Components library like Polymer or such instead of using declarative. However, feel free to use it :-)
+
 ###Motivation
 
 Native web user interfaces are restricted to the elements defined in the HTML and supported by browsers.
