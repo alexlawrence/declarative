@@ -1,5 +1,3 @@
-### :heavy_exclamation_mark: This module is DEPRECATED :heavy_exclamation_mark:
-
 # declarative
 
 Mapper for custom user interface markup.
